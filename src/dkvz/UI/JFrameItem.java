@@ -15,6 +15,7 @@ public class JFrameItem extends javax.swing.JFrame {
     private JFrameMain mainFrame = null;
     private Item itemToModify = null;
     private ArrayList<Item> components = null;
+    private ArrayList<Item> toRemove = null;
     
     /**
      * Creates new form JFrameItem
@@ -25,6 +26,7 @@ public class JFrameItem extends javax.swing.JFrame {
         this.itemToModify = new Item();
         this.jTextFieldItemID.setEditable(true);
         this.jTextFieldItemID.setEnabled(true);
+        this.toRemove = new ArrayList<Item>();
         this.components = new ArrayList<Item>();
     }
     
@@ -36,6 +38,7 @@ public class JFrameItem extends javax.swing.JFrame {
         this.jTextFieldItemID.setEditable(false);
         this.jTextFieldItemID.setEnabled(false);
         this.components = new ArrayList<Item>();
+        this.toRemove = new ArrayList<Item>();
         if (itemToModify.getComponents() != null && !itemToModify.getComponents().isEmpty()){
             for (Item item : itemToModify.getComponents()) {
                 this.components.add(item);
@@ -59,10 +62,10 @@ public class JFrameItem extends javax.swing.JFrame {
         jLabelCraftID = new javax.swing.JLabel();
         jLabelCraftQty = new javax.swing.JLabel();
         jTextFieldCraftID = new javax.swing.JTextField();
-        jSpinnerCraftQty = new javax.swing.JSpinner();
         jButtonCraftAdd = new javax.swing.JButton();
         jButtonCraftRemove = new javax.swing.JButton();
         jComboBoxCraftItems = new javax.swing.JComboBox();
+        jTextFieldQty = new javax.swing.JTextField();
         jPanelBottom = new javax.swing.JPanel();
         jButtonOK = new javax.swing.JButton();
         jButtonClose = new javax.swing.JButton();
@@ -94,6 +97,11 @@ public class JFrameItem extends javax.swing.JFrame {
 
         jButtonCraftRemove.setText("Remove");
         jButtonCraftRemove.setEnabled(false);
+        jButtonCraftRemove.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonCraftRemoveActionPerformed(evt);
+            }
+        });
 
         jComboBoxCraftItems.setModel(new DefaultComboBoxModel<Item>());
 
@@ -113,8 +121,8 @@ public class JFrameItem extends javax.swing.JFrame {
                         .addGroup(jPanelCenterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanelCenterLayout.createSequentialGroup()
                                 .addComponent(jLabelCraftQty)
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addComponent(jSpinnerCraftQty, javax.swing.GroupLayout.DEFAULT_SIZE, 104, Short.MAX_VALUE))
+                                .addGap(0, 52, Short.MAX_VALUE))
+                            .addComponent(jTextFieldQty))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButtonCraftAdd)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -131,12 +139,12 @@ public class JFrameItem extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanelCenterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jTextFieldCraftID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jSpinnerCraftQty, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButtonCraftAdd)
-                    .addComponent(jButtonCraftRemove))
+                    .addComponent(jButtonCraftRemove)
+                    .addComponent(jTextFieldQty, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jComboBoxCraftItems, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(21, Short.MAX_VALUE))
+                .addContainerGap(52, Short.MAX_VALUE))
         );
 
         getContentPane().add(jPanelCenter, java.awt.BorderLayout.CENTER);
@@ -174,6 +182,9 @@ public class JFrameItem extends javax.swing.JFrame {
             try {
                 long id = Long.parseLong(this.jTextFieldItemID.getText());
                 itemToModify.setId(id);
+                // TODO Process the components, also the components to remove:
+                
+                
                 this.mainFrame.getDataModel().addItem(itemToModify);
             } catch (NumberFormatException ex) {
                 // Could not parse the id.
@@ -190,18 +201,33 @@ public class JFrameItem extends javax.swing.JFrame {
         // If the item id is already in the list we're replacing that item ("edit mode").
         try {
             long id = Long.parseLong(this.jTextFieldCraftID.getText());
-            long qty = Long.parseLong(this.jSpinnerCraftQty.getValue().toString());
+            int qty = Integer.parseInt(this.jTextFieldQty.getText());
             if (qty <= 0) {
                 JOptionPane.showMessageDialog(this, "You're trying to add a quantity of 0.");
                 return;
             }
-         
+            Item compo = new Item();
+            compo.setComponent(true);
+            compo.setId(id);
+            compo.setQty(qty);
+            this.components.add(compo);
+            this.jComboBoxCraftItems.addItem(compo);
             // Reset the fields when adding worked.
-            
+            this.jTextFieldCraftID.setText("");
+            this.jTextFieldQty.setText("0");
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Could not parse the item ID, make sure it's a number.");
         }
     }//GEN-LAST:event_jButtonCraftAddActionPerformed
+
+    private void jButtonCraftRemoveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCraftRemoveActionPerformed
+        if (this.jComboBoxCraftItems.getSelectedItem() != null) {
+            Item item = (Item)this.jComboBoxCraftItems.getSelectedItem();
+            this.toRemove.add(item);
+            // TODO Remove from the other stuff too:
+            
+        }
+    }//GEN-LAST:event_jButtonCraftRemoveActionPerformed
 
     /**
      * @return the mainFrame
@@ -230,8 +256,8 @@ public class JFrameItem extends javax.swing.JFrame {
     private javax.swing.JPanel jPanelBottom;
     private javax.swing.JPanel jPanelCenter;
     private javax.swing.JPanel jPanelTop;
-    private javax.swing.JSpinner jSpinnerCraftQty;
     private javax.swing.JTextField jTextFieldCraftID;
     private javax.swing.JTextField jTextFieldItemID;
+    private javax.swing.JTextField jTextFieldQty;
     // End of variables declaration//GEN-END:variables
 }

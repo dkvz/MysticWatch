@@ -21,6 +21,7 @@ public class Item {
     private boolean component = false;
     private ArrayList<Item> components = null;
     private boolean refreshed = false;
+    private int qty = 0;
 
     @Override
     public String toString() {
@@ -183,6 +184,20 @@ public class Item {
      */
     public void setRefreshed(boolean refreshed) {
         this.refreshed = refreshed;
+    }
+
+    /**
+     * @return the qty
+     */
+    public int getQty() {
+        return qty;
+    }
+
+    /**
+     * @param qty the qty to set
+     */
+    public void setQty(int qty) {
+        this.qty = qty;
     }
     
 }

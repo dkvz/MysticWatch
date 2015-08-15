@@ -81,9 +81,9 @@
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" attributes="0">
                                   <Component id="jLabelCraftQty" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                                  <EmptySpace min="0" pref="52" max="32767" attributes="0"/>
                               </Group>
-                              <Component id="jSpinnerCraftQty" pref="104" max="32767" attributes="0"/>
+                              <Component id="jTextFieldQty" max="32767" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="jButtonCraftAdd" min="-2" max="-2" attributes="0"/>
@@ -106,13 +106,13 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="jTextFieldCraftID" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="jSpinnerCraftQty" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jButtonCraftAdd" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jButtonCraftRemove" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jTextFieldQty" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="jComboBoxCraftItems" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="21" max="32767" attributes="0"/>
+                  <EmptySpace pref="52" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -130,8 +130,6 @@
         </Component>
         <Component class="javax.swing.JTextField" name="jTextFieldCraftID">
         </Component>
-        <Component class="javax.swing.JSpinner" name="jSpinnerCraftQty">
-        </Component>
         <Component class="javax.swing.JButton" name="jButtonCraftAdd">
           <Properties>
             <Property name="text" type="java.lang.String" value="Add/Edit"/>
@@ -145,6 +143,9 @@
             <Property name="text" type="java.lang.String" value="Remove"/>
             <Property name="enabled" type="boolean" value="false"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonCraftRemoveActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JComboBox" name="jComboBoxCraftItems">
           <Properties>
@@ -152,6 +153,8 @@
               <Connection code="new DefaultComboBoxModel&lt;Item&gt;()" type="code"/>
             </Property>
           </Properties>
+        </Component>
+        <Component class="javax.swing.JTextField" name="jTextFieldQty">
         </Component>
       </SubComponents>
     </Container>

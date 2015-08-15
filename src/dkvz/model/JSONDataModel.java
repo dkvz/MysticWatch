@@ -66,6 +66,7 @@ public class JSONDataModel {
         props.put("name", item.getName());
         props.put("lowestSellOder", item.getLowestSellOrder());
         props.put("highestBuyOrder", item.getHighestBuyOrder());
+        props.put("qty", item.getQty());
         return props;
     }
 
