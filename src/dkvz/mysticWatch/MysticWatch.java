@@ -5,17 +5,30 @@
  */
 package dkvz.mysticWatch;
 
+import javax.swing.*;
+import dkvz.UI.*;
+import dkvz.model.*;
+
 /**
  *
  * @author william
  */
 public class MysticWatch {
-
+    
+    private static JFrameMain mainFrame;
+    
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
+        JSONDataModel dataModel = new JSONDataModel();
+        MysticWatch.mainFrame = new JFrameMain(dataModel);
+        MysticWatch.mainFrame.setVisible(true);
+        MysticWatch.mainFrame.setLocationRelativeTo(null);
+    }
+    
+    public static void exitApplication() {
+        System.exit(0);
     }
     
 }

@@ -1,0 +1,10 @@
+Libraries to use (not using Maven for this):
+  * Google's JSON-Simple
+  * Apache httpClient
+
+I created a "libraries" directory to hold those. Netbeans should be able to auto-find the libraries with the relative path. Another IDE may not, re-add the libraries accordingly.
+
+===== JSON-Simple =====
+Namespace is import org.json.simple.*;
+
+
