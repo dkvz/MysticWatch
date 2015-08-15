@@ -1,0 +1,16 @@
+Libraries to use (not using Maven for this):
+  * Google's JSON-Simple
+  * Apache httpClient
+
+I created a "libraries" directory to hold those. Netbeans should be able to auto-find the libraries with the relative path. Another IDE may not, re-add the libraries accordingly.
+
+===== JSON-Simple =====
+Namespace is import org.json.simple.*;
+
+
+===== Ideas - Issues =====
+  * The system could use an authentication token to check how much money you have in bank and which item you can afford (highlight those?).
+  * Add the column for the supply/demand ratio.
+  * In craft components, I should be able to put in fixed price stuff (stuff that you can't get on the TP).
+  * Some of the items also require a recipe...
+  * File->Exit does not ask for confirmation.

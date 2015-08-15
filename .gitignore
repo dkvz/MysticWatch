@@ -1,1 +1,5 @@
+data.json
 dist
+/build/
+dataFilesBackups
+working_notes.txt

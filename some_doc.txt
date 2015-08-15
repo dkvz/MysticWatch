@@ -1,0 +1,7 @@
+====== Some links to tech doc ======
+
+===== JSON =====
+http://www.mkyong.com/java/json-simple-example-read-and-write-json/
+
+===== Swing JTable =====
+http://docs.oracle.com/javase/tutorial/uiswing/components/table.html
