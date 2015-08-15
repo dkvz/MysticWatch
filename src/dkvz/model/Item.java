@@ -22,6 +22,15 @@ public class Item {
     private ArrayList<Item> components = null;
     private boolean refreshed = false;
 
+    @Override
+    public String toString() {
+        if (this.id > 0) {
+            return Long.toString(this.id).concat(" - ").concat(this.name);
+        } else {
+            return "";
+        }
+    }
+    
     /**
      * @return the id
      */

@@ -2,6 +2,9 @@
 package dkvz.UI;
 
 import dkvz.model.*;
+import javax.swing.*;
+import java.util.*;
+
 
 /**
  *
@@ -11,24 +14,34 @@ public class JFrameItem extends javax.swing.JFrame {
 
     private JFrameMain mainFrame = null;
     private Item itemToModify = null;
+    private ArrayList<Item> components = null;
     
     /**
      * Creates new form JFrameItem
      */
     public JFrameItem(JFrameMain mainFrame) {
         this.mainFrame = mainFrame;
-        this.itemToModify = null;
+        initComponents();
+        this.itemToModify = new Item();
         this.jTextFieldItemID.setEditable(true);
         this.jTextFieldItemID.setEnabled(true);
-        initComponents();
+        this.components = new ArrayList<Item>();
     }
     
     public JFrameItem(JFrameMain mainFrame, Item itemToModify) {
         this.mainFrame = mainFrame;
+        initComponents();
         this.itemToModify = itemToModify;
         this.jTextFieldItemID.setText(Long.toString(itemToModify.getId()));
         this.jTextFieldItemID.setEditable(false);
         this.jTextFieldItemID.setEnabled(false);
+        this.components = new ArrayList<Item>();
+        if (itemToModify.getComponents() != null && !itemToModify.getComponents().isEmpty()){
+            for (Item item : itemToModify.getComponents()) {
+                this.components.add(item);
+                this.jComboBoxCraftItems.addItem(item);
+            }
+        }
     }
 
     /**
@@ -73,9 +86,16 @@ public class JFrameItem extends javax.swing.JFrame {
         jLabelCraftQty.setText("Quantity");
 
         jButtonCraftAdd.setText("Add/Edit");
+        jButtonCraftAdd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonCraftAddActionPerformed(evt);
+            }
+        });
 
         jButtonCraftRemove.setText("Remove");
         jButtonCraftRemove.setEnabled(false);
+
+        jComboBoxCraftItems.setModel(new DefaultComboBoxModel<Item>());
 
         javax.swing.GroupLayout jPanelCenterLayout = new javax.swing.GroupLayout(jPanelCenter);
         jPanelCenter.setLayout(jPanelCenterLayout);
@@ -116,7 +136,7 @@ public class JFrameItem extends javax.swing.JFrame {
                     .addComponent(jButtonCraftRemove))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jComboBoxCraftItems, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(13, Short.MAX_VALUE))
+                .addContainerGap(21, Short.MAX_VALUE))
         );
 
         getContentPane().add(jPanelCenter, java.awt.BorderLayout.CENTER);
@@ -149,8 +169,39 @@ public class JFrameItem extends javax.swing.JFrame {
     }//GEN-LAST:event_jButtonCloseActionPerformed
 
     private void jButtonOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonOKActionPerformed
-        
+        if (this.itemToModify.getId() < 0) {
+            // We're trying to add a new item.
+            try {
+                long id = Long.parseLong(this.jTextFieldItemID.getText());
+                itemToModify.setId(id);
+                this.mainFrame.getDataModel().addItem(itemToModify);
+            } catch (NumberFormatException ex) {
+                // Could not parse the id.
+                JOptionPane.showMessageDialog(this, "Could not parse the item ID, make sure it's a number");
+            }
+        } else {
+            // Edit mode.
+            
+        }
     }//GEN-LAST:event_jButtonOKActionPerformed
+
+    private void jButtonCraftAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCraftAddActionPerformed
+        // Must check that qty is not 0, and that we can parse the id.
+        // If the item id is already in the list we're replacing that item ("edit mode").
+        try {
+            long id = Long.parseLong(this.jTextFieldCraftID.getText());
+            long qty = Long.parseLong(this.jSpinnerCraftQty.getValue().toString());
+            if (qty <= 0) {
+                JOptionPane.showMessageDialog(this, "You're trying to add a quantity of 0.");
+                return;
+            }
+         
+            // Reset the fields when adding worked.
+            
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Could not parse the item ID, make sure it's a number.");
+        }
+    }//GEN-LAST:event_jButtonCraftAddActionPerformed
 
     /**
      * @return the mainFrame
