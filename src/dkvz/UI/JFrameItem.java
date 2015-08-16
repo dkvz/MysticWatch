@@ -70,6 +70,7 @@ public class JFrameItem extends javax.swing.JFrame {
         jButtonClose = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Item Details");
 
         jPanelTop.setBorder(javax.swing.BorderFactory.createTitledBorder("Add item to list"));
 
@@ -192,7 +193,7 @@ public class JFrameItem extends javax.swing.JFrame {
                 }
                 this.mainFrame.getDataModel().addItem(itemToModify);
                 ItemTableDataModel model = (ItemTableDataModel) this.mainFrame.getjTableMain().getModel();
-                model.fireTableRowsInserted(this.mainFrame.getDataModel().getItemList().size() - 1, this.mainFrame.getDataModel().count());
+                model.fireTableRowsInserted(this.mainFrame.getDataModel().count() - 1, this.mainFrame.getDataModel().count() - 1);
                 this.mainFrame.logMessage("Added item " + Long.toString(id) + " - Data Model item count: " + this.mainFrame.getDataModel().count());
             } catch (NumberFormatException ex) {
                 // Could not parse the id.
@@ -205,7 +206,9 @@ public class JFrameItem extends javax.swing.JFrame {
             // Because itemToModify is a reference it should work on the dataModel...
             itemToModify.setComponents(this.components);
             ItemTableDataModel model = (ItemTableDataModel) this.mainFrame.getjTableMain().getModel();
-            model.fireTableRowsUpdated(0, this.mainFrame.getDataModel().count());
+            //model.fireTableRowsUpdated(0, this.mainFrame.getDataModel().count());
+            // Previous code doesn't work with the sorter, so here goes:
+            model.fireTableDataChanged();
         }
         this.mainFrame.repaint();
         this.closeFrame();

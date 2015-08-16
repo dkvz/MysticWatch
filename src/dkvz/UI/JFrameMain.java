@@ -3,9 +3,11 @@ package dkvz.UI;
 
 import dkvz.mysticWatch.*;
 import dkvz.model.*;
+import java.awt.Cursor;
 import java.io.*;
 import java.util.*;
 import java.text.SimpleDateFormat;
+import javax.swing.JOptionPane;
 import org.json.simple.parser.ParseException;
 
 /**
@@ -41,6 +43,7 @@ public class JFrameMain extends javax.swing.JFrame {
         SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
 	String dateToStr = format.format(new Date());
         this.jTextAreaLog.append(dateToStr.concat(" - ").concat(message).concat("\r\n"));
+        this.jTextAreaLog.setCaretPosition(this.jTextAreaLog.getText().length());
     }
     
     private void loadData() {
@@ -48,6 +51,7 @@ public class JFrameMain extends javax.swing.JFrame {
             this.logMessage("Loading data...");
             // Try to load the data model from disk.
             this.dataModel.loadData();
+            this.logMessage("Loaded data from disk");
         } catch (FileNotFoundException ex) {
             this.logMessage(this.dataModel.getFilename() + " not found. Please add some items to the list.");
         } catch (IOException ex) {
@@ -78,6 +82,7 @@ public class JFrameMain extends javax.swing.JFrame {
         jButtonRemove = new javax.swing.JButton();
         jButtonModify = new javax.swing.JButton();
         jButtonRefresh = new javax.swing.JButton();
+        jButtonSave = new javax.swing.JButton();
         jMenuBarMain = new javax.swing.JMenuBar();
         jMenuFile = new javax.swing.JMenu();
         jMenuItemExit = new javax.swing.JMenuItem();
@@ -86,6 +91,9 @@ public class JFrameMain extends javax.swing.JFrame {
         setTitle("Mystic Watch");
         setSize(new java.awt.Dimension(0, 0));
         addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
             public void windowClosed(java.awt.event.WindowEvent evt) {
                 formWindowClosed(evt);
             }
@@ -102,7 +110,13 @@ public class JFrameMain extends javax.swing.JFrame {
 
         jPanelCenter.setLayout(new java.awt.BorderLayout());
 
+        jTableMain.setAutoCreateRowSorter(true);
         jTableMain.setModel(new ItemTableDataModel(this.dataModel));
+        jTableMain.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTableMainMouseClicked(evt);
+            }
+        });
         jScrollPaneCenter.setViewportView(jTableMain);
 
         jPanelCenter.add(jScrollPaneCenter, java.awt.BorderLayout.CENTER);
@@ -140,6 +154,14 @@ public class JFrameMain extends javax.swing.JFrame {
         jButtonRefresh.setText("Refresh Values");
         jPanelTop.add(jButtonRefresh);
 
+        jButtonSave.setText("Save Data");
+        jButtonSave.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonSaveActionPerformed(evt);
+            }
+        });
+        jPanelTop.add(jButtonSave);
+
         getContentPane().add(jPanelTop, java.awt.BorderLayout.NORTH);
 
         jMenuFile.setMnemonic('F');
@@ -159,7 +181,7 @@ public class JFrameMain extends javax.swing.JFrame {
 
         setJMenuBar(jMenuBarMain);
 
-        setBounds(0, 0, 1210, 830);
+        setBounds(0, 0, 1210, 700);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jMenuItemExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemExitActionPerformed
@@ -186,7 +208,7 @@ public class JFrameMain extends javax.swing.JFrame {
     private void jButtonModifyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonModifyActionPerformed
         // Find selected item:
         if (this.jTableMain.getSelectedRow() >= 0) {
-            Item item = this.getDataModel().getItemList().get(this.jTableMain.getSelectedRow());
+            Item item = this.getDataModel().getItemList().get(this.jTableMain.convertRowIndexToView(this.jTableMain.getSelectedRow()));
             if (this.itemFrame == null) {
                 this.itemFrame = new JFrameItem(this, item);
                 this.itemFrame.setVisible(true);
@@ -201,6 +223,37 @@ public class JFrameMain extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jButtonModifyActionPerformed
 
+    private void jTableMainMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTableMainMouseClicked
+        if (evt.getClickCount() == 2) {
+            this.jButtonModifyActionPerformed(null);
+        }
+    }//GEN-LAST:event_jTableMainMouseClicked
+
+    public void saveModel() {
+        this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        try {
+            this.dataModel.saveData();
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(this, "Could not save data JSON file, IOError.\r\nPlease check file permissions in application directory", "Error saving file", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Unexpected exception saving JSON file", "Error saving file", JOptionPane.ERROR_MESSAGE);
+        } finally {
+            this.setCursor(Cursor.getDefaultCursor());
+        }
+    }
+    
+    private void jButtonSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSaveActionPerformed
+        this.saveModel();
+    }//GEN-LAST:event_jButtonSaveActionPerformed
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        // Ask to save data before quitting:
+        int dialogResult = JOptionPane.showConfirmDialog (null, "Do you want to save your data?", "Save data", JOptionPane.YES_NO_OPTION);
+        if (dialogResult == JOptionPane.YES_OPTION) {
+            this.saveModel();
+        }
+    }//GEN-LAST:event_formWindowClosing
+
     
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -208,6 +261,7 @@ public class JFrameMain extends javax.swing.JFrame {
     private javax.swing.JButton jButtonModify;
     private javax.swing.JButton jButtonRefresh;
     private javax.swing.JButton jButtonRemove;
+    private javax.swing.JButton jButtonSave;
     private javax.swing.JLabel jLabelStatus;
     private javax.swing.JMenuBar jMenuBarMain;
     private javax.swing.JMenu jMenuFile;
