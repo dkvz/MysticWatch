@@ -32,6 +32,22 @@ public class Item {
         }
     }
     
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+        if (obj == this) return true;
+        if (!(obj instanceof Item))return false;
+        Item it = (Item)obj;
+        return it.getId() == this.getId();
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 79 * hash + (int) (this.id ^ (this.id >>> 32));
+        return hash;
+    }
+    
     /**
      * @return the id
      */

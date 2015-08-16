@@ -15,7 +15,6 @@ public class JFrameItem extends javax.swing.JFrame {
     private JFrameMain mainFrame = null;
     private Item itemToModify = null;
     private ArrayList<Item> components = null;
-    private ArrayList<Item> toRemove = null;
     
     /**
      * Creates new form JFrameItem
@@ -26,7 +25,6 @@ public class JFrameItem extends javax.swing.JFrame {
         this.itemToModify = new Item();
         this.jTextFieldItemID.setEditable(true);
         this.jTextFieldItemID.setEnabled(true);
-        this.toRemove = new ArrayList<Item>();
         this.components = new ArrayList<Item>();
     }
     
@@ -38,7 +36,6 @@ public class JFrameItem extends javax.swing.JFrame {
         this.jTextFieldItemID.setEditable(false);
         this.jTextFieldItemID.setEnabled(false);
         this.components = new ArrayList<Item>();
-        this.toRemove = new ArrayList<Item>();
         if (itemToModify.getComponents() != null && !itemToModify.getComponents().isEmpty()){
             for (Item item : itemToModify.getComponents()) {
                 this.components.add(item);
@@ -104,6 +101,11 @@ public class JFrameItem extends javax.swing.JFrame {
         });
 
         jComboBoxCraftItems.setModel(new DefaultComboBoxModel<Item>());
+        jComboBoxCraftItems.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBoxCraftItemsActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanelCenterLayout = new javax.swing.GroupLayout(jPanelCenter);
         jPanelCenter.setLayout(jPanelCenterLayout);
@@ -177,14 +179,15 @@ public class JFrameItem extends javax.swing.JFrame {
     }//GEN-LAST:event_jButtonCloseActionPerformed
 
     private void jButtonOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonOKActionPerformed
-        if (this.itemToModify.getId() < 0) {
+        if (this.itemToModify.getId() <= 0) {
             // We're trying to add a new item.
             try {
                 long id = Long.parseLong(this.jTextFieldItemID.getText());
                 itemToModify.setId(id);
-                // TODO Process the components, also the components to remove:
-                
-                
+                // Process the components:
+                if (this.components.size() > 0) {
+                    itemToModify.setComponents(this.components);
+                }
                 this.mainFrame.getDataModel().addItem(itemToModify);
             } catch (NumberFormatException ex) {
                 // Could not parse the id.
@@ -192,7 +195,9 @@ public class JFrameItem extends javax.swing.JFrame {
             }
         } else {
             // Edit mode.
-            
+            // We always assign the component list.
+            // Because itemToModify is a reference it should work on the dataModel...
+            itemToModify.setComponents(this.components);
         }
     }//GEN-LAST:event_jButtonOKActionPerformed
 
@@ -210,24 +215,66 @@ public class JFrameItem extends javax.swing.JFrame {
             compo.setComponent(true);
             compo.setId(id);
             compo.setQty(qty);
+            // If component already exists we're just changing the quantity:
+            for (int i = 0; i < this.components.size(); i++) {
+                // Equals just checks the IDs.
+                if (this.components.get(i).equals(compo)) {
+                    // Already exists, remove and rebuild combo:
+                    // Let's try the built in method:
+                    this.jComboBoxCraftItems.removeItem(this.components.get(i));
+                    this.components.remove(i);
+                    break;
+                }
+            }
             this.components.add(compo);
             this.jComboBoxCraftItems.addItem(compo);
             // Reset the fields when adding worked.
-            this.jTextFieldCraftID.setText("");
-            this.jTextFieldQty.setText("0");
+            this.resetCraftControls();
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Could not parse the item ID, make sure it's a number.");
         }
     }//GEN-LAST:event_jButtonCraftAddActionPerformed
 
+    private void resetCraftControls() {
+        this.jTextFieldCraftID.setText("");
+        this.jTextFieldQty.setText("0");
+        this.jButtonCraftRemove.setEnabled(false);
+    }
+    
+    private void rebuildCombo() {
+        this.jComboBoxCraftItems.removeAllItems();
+        for (Item item : this.components) {
+            this.jComboBoxCraftItems.addItem(item);
+        }
+        this.repaint();
+    }
+    
     private void jButtonCraftRemoveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCraftRemoveActionPerformed
         if (this.jComboBoxCraftItems.getSelectedItem() != null) {
             Item item = (Item)this.jComboBoxCraftItems.getSelectedItem();
-            this.toRemove.add(item);
-            // TODO Remove from the other stuff too:
-            
+            // Remove from the other stuff too:
+            for (int i = 0; i < this.components.size(); i++) {
+                if (this.components.get(i).equals(item)) {
+                    this.components.remove(i);
+                    break;
+                }
+            }
+            // Rebuild the model for the comboBox...
+            //this.rebuildCombo();
+            // Let's try the builtin method, I suppose it's using equals so it should work:
+            this.jComboBoxCraftItems.removeItem(item);
+            this.resetCraftControls();
         }
     }//GEN-LAST:event_jButtonCraftRemoveActionPerformed
+
+    private void jComboBoxCraftItemsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxCraftItemsActionPerformed
+        if (this.jComboBoxCraftItems.getSelectedItem() != null) {
+            Item item = (Item)this.jComboBoxCraftItems.getSelectedItem();
+            this.jTextFieldCraftID.setText(Long.toString(item.getId()));
+            this.jTextFieldQty.setText(Integer.toString(item.getQty()));
+            this.jButtonCraftRemove.setEnabled(true);
+        }
+    }//GEN-LAST:event_jComboBoxCraftItemsActionPerformed
 
     /**
      * @return the mainFrame
