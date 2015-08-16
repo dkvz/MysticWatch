@@ -48,6 +48,22 @@ public class Item {
         return hash;
     }
     
+    public double getCraftingCostLow() {
+        if (this.components != null && this.components.size() > 0) {
+            return 0;
+        } else {
+            return 0;
+        }
+    }
+    
+    public double getCraftingCostHigh() {
+        if (this.components != null && this.components.size() > 0) {
+            return 0;
+        } else {
+            return 0;
+        }
+    }
+    
     /**
      * @return the id
      */

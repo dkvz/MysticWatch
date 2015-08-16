@@ -84,6 +84,7 @@ public class JFrameMain extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Mystic Watch");
+        setSize(new java.awt.Dimension(0, 0));
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosed(java.awt.event.WindowEvent evt) {
                 formWindowClosed(evt);
@@ -101,17 +102,7 @@ public class JFrameMain extends javax.swing.JFrame {
 
         jPanelCenter.setLayout(new java.awt.BorderLayout());
 
-        jTableMain.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
+        jTableMain.setModel(new ItemTableDataModel(this.dataModel));
         jScrollPaneCenter.setViewportView(jTableMain);
 
         jPanelCenter.add(jScrollPaneCenter, java.awt.BorderLayout.CENTER);
@@ -139,9 +130,14 @@ public class JFrameMain extends javax.swing.JFrame {
         jPanelTop.add(jButtonRemove);
 
         jButtonModify.setText("Modify");
+        jButtonModify.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonModifyActionPerformed(evt);
+            }
+        });
         jPanelTop.add(jButtonModify);
 
-        jButtonRefresh.setText("Refresh");
+        jButtonRefresh.setText("Refresh Values");
         jPanelTop.add(jButtonRefresh);
 
         getContentPane().add(jPanelTop, java.awt.BorderLayout.NORTH);
@@ -163,7 +159,7 @@ public class JFrameMain extends javax.swing.JFrame {
 
         setJMenuBar(jMenuBarMain);
 
-        pack();
+        setBounds(0, 0, 1210, 830);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jMenuItemExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemExitActionPerformed
@@ -186,6 +182,24 @@ public class JFrameMain extends javax.swing.JFrame {
             this.itemFrame.repaint();
         }
     }//GEN-LAST:event_jButtonAddActionPerformed
+
+    private void jButtonModifyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonModifyActionPerformed
+        // Find selected item:
+        if (this.jTableMain.getSelectedRow() >= 0) {
+            Item item = this.getDataModel().getItemList().get(this.jTableMain.getSelectedRow());
+            if (this.itemFrame == null) {
+                this.itemFrame = new JFrameItem(this, item);
+                this.itemFrame.setVisible(true);
+                this.itemFrame.setLocationRelativeTo(null);
+                this.itemFrame.toFront();
+            } else {
+                this.itemFrame.toFront();
+                this.itemFrame.setItemToModify(item);
+                this.itemFrame.reloadItem();
+                this.itemFrame.repaint();
+            }
+        }
+    }//GEN-LAST:event_jButtonModifyActionPerformed
 
     
 
@@ -234,5 +248,12 @@ public class JFrameMain extends javax.swing.JFrame {
      */
     public void setDataModel(JSONDataModel dataModel) {
         this.dataModel = dataModel;
+    }
+
+    /**
+     * @return the jTableMain
+     */
+    public javax.swing.JTable getjTableMain() {
+        return jTableMain;
     }
 }

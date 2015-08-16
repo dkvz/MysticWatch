@@ -1,10 +1,8 @@
-
 package dkvz.UI;
 
 import dkvz.model.*;
 import javax.swing.*;
 import java.util.*;
-
 
 /**
  *
@@ -15,7 +13,7 @@ public class JFrameItem extends javax.swing.JFrame {
     private JFrameMain mainFrame = null;
     private Item itemToModify = null;
     private ArrayList<Item> components = null;
-    
+
     /**
      * Creates new form JFrameItem
      */
@@ -27,16 +25,20 @@ public class JFrameItem extends javax.swing.JFrame {
         this.jTextFieldItemID.setEnabled(true);
         this.components = new ArrayList<Item>();
     }
-    
+
     public JFrameItem(JFrameMain mainFrame, Item itemToModify) {
         this.mainFrame = mainFrame;
         initComponents();
         this.itemToModify = itemToModify;
+        this.reloadItem();
+    }
+
+    public void reloadItem() {
         this.jTextFieldItemID.setText(Long.toString(itemToModify.getId()));
         this.jTextFieldItemID.setEditable(false);
         this.jTextFieldItemID.setEnabled(false);
         this.components = new ArrayList<Item>();
-        if (itemToModify.getComponents() != null && !itemToModify.getComponents().isEmpty()){
+        if (itemToModify.getComponents() != null && !itemToModify.getComponents().isEmpty()) {
             for (Item item : itemToModify.getComponents()) {
                 this.components.add(item);
                 this.jComboBoxCraftItems.addItem(item);
@@ -175,7 +177,7 @@ public class JFrameItem extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCloseActionPerformed
-        this.dispose();
+        this.closeFrame();
     }//GEN-LAST:event_jButtonCloseActionPerformed
 
     private void jButtonOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonOKActionPerformed
@@ -189,17 +191,30 @@ public class JFrameItem extends javax.swing.JFrame {
                     itemToModify.setComponents(this.components);
                 }
                 this.mainFrame.getDataModel().addItem(itemToModify);
+                ItemTableDataModel model = (ItemTableDataModel) this.mainFrame.getjTableMain().getModel();
+                model.fireTableRowsInserted(this.mainFrame.getDataModel().getItemList().size() - 1, this.mainFrame.getDataModel().count());
+                this.mainFrame.logMessage("Added item " + Long.toString(id) + " - Data Model item count: " + this.mainFrame.getDataModel().count());
             } catch (NumberFormatException ex) {
                 // Could not parse the id.
                 JOptionPane.showMessageDialog(this, "Could not parse the item ID, make sure it's a number");
+                return;
             }
         } else {
             // Edit mode.
             // We always assign the component list.
             // Because itemToModify is a reference it should work on the dataModel...
             itemToModify.setComponents(this.components);
+            ItemTableDataModel model = (ItemTableDataModel) this.mainFrame.getjTableMain().getModel();
+            model.fireTableRowsUpdated(0, this.mainFrame.getDataModel().count());
         }
+        this.mainFrame.repaint();
+        this.closeFrame();
     }//GEN-LAST:event_jButtonOKActionPerformed
+
+    private void closeFrame() {
+        this.mainFrame.setItemFrame(null);
+        this.dispose();
+    }
 
     private void jButtonCraftAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCraftAddActionPerformed
         // Must check that qty is not 0, and that we can parse the id.
@@ -213,6 +228,7 @@ public class JFrameItem extends javax.swing.JFrame {
             }
             Item compo = new Item();
             compo.setComponent(true);
+            compo.setName("Requires update for name");
             compo.setId(id);
             compo.setQty(qty);
             // If component already exists we're just changing the quantity:
@@ -240,7 +256,7 @@ public class JFrameItem extends javax.swing.JFrame {
         this.jTextFieldQty.setText("0");
         this.jButtonCraftRemove.setEnabled(false);
     }
-    
+
     private void rebuildCombo() {
         this.jComboBoxCraftItems.removeAllItems();
         for (Item item : this.components) {
@@ -248,10 +264,10 @@ public class JFrameItem extends javax.swing.JFrame {
         }
         this.repaint();
     }
-    
+
     private void jButtonCraftRemoveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCraftRemoveActionPerformed
         if (this.jComboBoxCraftItems.getSelectedItem() != null) {
-            Item item = (Item)this.jComboBoxCraftItems.getSelectedItem();
+            Item item = (Item) this.jComboBoxCraftItems.getSelectedItem();
             // Remove from the other stuff too:
             for (int i = 0; i < this.components.size(); i++) {
                 if (this.components.get(i).equals(item)) {
@@ -269,7 +285,7 @@ public class JFrameItem extends javax.swing.JFrame {
 
     private void jComboBoxCraftItemsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxCraftItemsActionPerformed
         if (this.jComboBoxCraftItems.getSelectedItem() != null) {
-            Item item = (Item)this.jComboBoxCraftItems.getSelectedItem();
+            Item item = (Item) this.jComboBoxCraftItems.getSelectedItem();
             this.jTextFieldCraftID.setText(Long.toString(item.getId()));
             this.jTextFieldQty.setText(Integer.toString(item.getQty()));
             this.jButtonCraftRemove.setEnabled(true);
@@ -307,4 +323,18 @@ public class JFrameItem extends javax.swing.JFrame {
     private javax.swing.JTextField jTextFieldItemID;
     private javax.swing.JTextField jTextFieldQty;
     // End of variables declaration//GEN-END:variables
+
+    /**
+     * @return the itemToModify
+     */
+    public Item getItemToModify() {
+        return itemToModify;
+    }
+
+    /**
+     * @param itemToModify the itemToModify to set
+     */
+    public void setItemToModify(Item itemToModify) {
+        this.itemToModify = itemToModify;
+    }
 }

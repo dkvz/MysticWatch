@@ -47,6 +47,10 @@ public class JSONDataModel {
         return found;
     }
     
+    public int count() {
+        return this.itemList.size();
+    }
+    
     private HashMap<String, Object> populateItemHashMap(Item item) {
         HashMap<String, Object> props = new HashMap<String, Object>();
         props.put("id", item.getId());
