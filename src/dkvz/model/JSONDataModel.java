@@ -15,6 +15,9 @@ import org.json.simple.parser.*;
 public class JSONDataModel {
 
     private ArrayList<Item> itemList = new ArrayList<Item>();
+    /**
+     * Specify default filename for the JSON file here.
+     */
     private String filename = "data.json";
     
     public static final String PROPERTY_ID = "id";
