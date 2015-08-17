@@ -11,13 +11,18 @@ public class Item {
     
     private long id = -1;
     private String name = "";
-    private long offer;
-    private long demand;
-    private double highestBuyOrder;
-    private double lowestSellOrder;
+    private long offer = 0;
+    private long demand = 0;
+    // Actually I should've used the prices in copper, then Double is really not needed.
+    // Moreover, the API returns values in copper.
+    // Since I want MONEY I'll put all the prices in gold.
+    private double highestBuyOrder = 0.0;
+    private double lowestSellOrder = 0.0;
     // Those next two values must include taxes.
-    private double profitFromSellOrder = 0;
-    private double profitFromDirectSelling = 0;
+    private double profitFromSellOrder = 0.0;
+    private double profitFromDirectSelling = 0.0;
+    private double lowestProfitFromSellOrder = 0.0;
+    private double lowestProfitFromDirectSelling = 0.0;
     private boolean component = false;
     private ArrayList<Item> components = null;
     private boolean refreshed = false;
@@ -48,19 +53,31 @@ public class Item {
         return hash;
     }
     
+    // We're going to calculate a lot of values in real time.
+    // It would be better optimized to just do it once, and
+    // have the "refreshed" flag really work.
+    // A computer that can run Guild Wars 2 should be able to compute this though...
     public double getCraftingCostLow() {
         if (this.components != null && this.components.size() > 0) {
-            return 0;
+            Double cost = 0.0;
+            for (Item item : this.components) {
+                cost += item.getHighestBuyOrder() * item.getQty();
+            }
+            return cost;
         } else {
-            return 0;
+            return 0.0;
         }
     }
     
     public double getCraftingCostHigh() {
         if (this.components != null && this.components.size() > 0) {
-            return 0;
+            Double cost = 0.0;
+            for (Item item : this.components) {
+                cost += item.getLowestSellOrder() * item.getQty();
+            }
+            return cost;
         } else {
-            return 0;
+            return 0.0;
         }
     }
     
@@ -157,10 +174,15 @@ public class Item {
     }
 
     /**
+     * I'm calculating this value everytime, which isn't very effective.
+     * I've talked about this earlier in this class.
+     * Those methods used the lowest prices for the components, there is 
+     * another for the higher prices.
      * @return the profitFromSellOrder
      */
     public double getProfitFromSellOrder() {
-        return profitFromSellOrder;
+        this.profitFromSellOrder = this.getLowestSellOrder() - this.getCraftingCostLow();
+        return this.profitFromSellOrder;
     }
 
     /**
@@ -174,6 +196,7 @@ public class Item {
      * @return the profitFromDirectSelling
      */
     public double getProfitFromDirectSelling() {
+        this.profitFromDirectSelling = this.getHighestBuyOrder() - this.getCraftingCostLow();
         return profitFromDirectSelling;
     }
 
@@ -238,6 +261,36 @@ public class Item {
      */
     public void setQty(int qty) {
         this.qty = qty;
+    }
+
+    /**
+     * @return the lowestProfitFromSellOrder
+     */
+    public double getLowestProfitFromSellOrder() {
+        this.lowestProfitFromSellOrder = this.getLowestSellOrder() - this.getCraftingCostHigh();
+        return lowestProfitFromSellOrder;
+    }
+
+    /**
+     * @param lowestProfitFromSellOrder the lowestProfitFromSellOrder to set
+     */
+    public void setLowestProfitFromSellOrder(double lowestProfitFromSellOrder) {
+        this.lowestProfitFromSellOrder = lowestProfitFromSellOrder;
+    }
+
+    /**
+     * @return the lowestProfitFromDirectSelling
+     */
+    public double getLowestProfitFromDirectSelling() {
+        this.lowestProfitFromDirectSelling = this.getHighestBuyOrder() - this.getCraftingCostHigh();
+        return lowestProfitFromDirectSelling;
+    }
+
+    /**
+     * @param lowestProfitFromDirectSelling the lowestProfitFromDirectSelling to set
+     */
+    public void setLowestProfitFromDirectSelling(double lowestProfitFromDirectSelling) {
+        this.lowestProfitFromDirectSelling = lowestProfitFromDirectSelling;
     }
     
 }

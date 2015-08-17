@@ -106,6 +106,7 @@ public class JSONDataModel {
             //if (item.isRefreshed()) {
             // There is something to save since last time (apparently, I'll have to 
             // reset this bool somewhere).
+            // OK I'm not using that concept for now, it needs revising anyway.
             HashMap<String, Object> props = this.populateItemHashMap(item);
             if (item.getComponents() != null && !item.getComponents().isEmpty()) {
                 // Save the components too.

@@ -23,6 +23,8 @@ public class GW2APIHelper {
     public static final String URL_BASE_LISTINGS = "http://api.guildwars2.com/v2/commerce/listings/";
     public static final String URL_BASE_PRICES = "http://api.guildwars2.com/v2/commerce/prices/";
     
+    // Would be smart to set the name only if it's empty, but I'll leave to the logic using this
+    // static method.
     public static String getItemName(long itemId) throws IOException, org.json.simple.parser.ParseException {
         // They do not close httpclient in examples I've seen, I guess it kinda closes itself?
         // Maybe I'm going to close the clients that I'm going to run periodically.
@@ -79,8 +81,9 @@ public class GW2APIHelper {
                 }
                 Long highestBuy = (Long)buys.get("unit_price");
                 Long lowestSell = (Long)sells.get("unit_price");
-                item.setHighestBuyOrder(highestBuy.doubleValue());
-                item.setLowestSellOrder(lowestSell.doubleValue());
+                // We're getting the costs in gold so we have to divide by 10000.
+                item.setHighestBuyOrder(highestBuy / 10000.0);
+                item.setLowestSellOrder(lowestSell/ 10000.0);
                 item.setDemand((Long)buys.get("quantity"));
                 item.setOffer((Long)sells.get("quantity"));
                 EntityUtils.consume(content);
