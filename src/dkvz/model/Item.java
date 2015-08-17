@@ -91,6 +91,10 @@ public class Item {
     public void setName(String name) {
         this.name = name;
     }
+    
+    public long getSupply() {
+        return offer;
+    }
 
     /**
      * @return the offer
@@ -104,6 +108,10 @@ public class Item {
      */
     public void setOffer(long offer) {
         this.offer = offer;
+    }
+    
+    public void setSupply(long supply) {
+        this.offer = supply;
     }
 
     /**

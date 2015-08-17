@@ -7,6 +7,8 @@ import java.awt.Cursor;
 import java.io.*;
 import java.util.*;
 import java.text.SimpleDateFormat;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import org.json.simple.parser.ParseException;
 
@@ -83,6 +85,7 @@ public class JFrameMain extends javax.swing.JFrame {
         jButtonModify = new javax.swing.JButton();
         jButtonRefresh = new javax.swing.JButton();
         jButtonSave = new javax.swing.JButton();
+        jButtonSecret = new javax.swing.JButton();
         jMenuBarMain = new javax.swing.JMenuBar();
         jMenuFile = new javax.swing.JMenu();
         jMenuItemExit = new javax.swing.JMenuItem();
@@ -161,6 +164,14 @@ public class JFrameMain extends javax.swing.JFrame {
             }
         });
         jPanelTop.add(jButtonSave);
+
+        jButtonSecret.setText("Secret Button");
+        jButtonSecret.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonSecretActionPerformed(evt);
+            }
+        });
+        jPanelTop.add(jButtonSecret);
 
         getContentPane().add(jPanelTop, java.awt.BorderLayout.NORTH);
 
@@ -254,6 +265,22 @@ public class JFrameMain extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_formWindowClosing
 
+    private void jButtonSecretActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSecretActionPerformed
+        try {
+            Item item = new Item();
+            item.setId(31065);
+            GW2APIHelper.getSupplyDemandHighBuyLowSellForItem(item);
+            this.logMessage("Item highest buy order: " + item.getHighestBuyOrder());
+            this.logMessage("Item lowest sell order: " + item.getLowestSellOrder());
+            this.logMessage("Item demand: " + item.getDemand());
+            this.logMessage("Item supply: " + item.getOffer());
+        } catch (IOException ex) {
+            Logger.getLogger(JFrameMain.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ParseException ex) {
+            Logger.getLogger(JFrameMain.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jButtonSecretActionPerformed
+
     
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -262,6 +289,7 @@ public class JFrameMain extends javax.swing.JFrame {
     private javax.swing.JButton jButtonRefresh;
     private javax.swing.JButton jButtonRemove;
     private javax.swing.JButton jButtonSave;
+    private javax.swing.JButton jButtonSecret;
     private javax.swing.JLabel jLabelStatus;
     private javax.swing.JMenuBar jMenuBarMain;
     private javax.swing.JMenu jMenuFile;

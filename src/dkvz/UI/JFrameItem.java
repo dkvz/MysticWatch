@@ -69,7 +69,7 @@ public class JFrameItem extends javax.swing.JFrame {
         jButtonOK = new javax.swing.JButton();
         jButtonClose = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Item Details");
 
         jPanelTop.setBorder(javax.swing.BorderFactory.createTitledBorder("Add item to list"));
