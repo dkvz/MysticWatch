@@ -150,6 +150,11 @@ public class JFrameMain extends javax.swing.JFrame {
         jPanelTop.add(jButtonAdd);
 
         jButtonRemove.setText("Remove");
+        jButtonRemove.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonRemoveActionPerformed(evt);
+            }
+        });
         jPanelTop.add(jButtonRemove);
 
         jButtonModify.setText("Modify");
@@ -337,6 +342,16 @@ public class JFrameMain extends javax.swing.JFrame {
     private void jButtonRefreshSelectedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRefreshSelectedActionPerformed
         this.refreshAction(true);
     }//GEN-LAST:event_jButtonRefreshSelectedActionPerformed
+
+    private void jButtonRemoveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRemoveActionPerformed
+        if (this.jTableMain.getSelectedRow() >= 0) {
+            Item item = this.getDataModel().getItemList().get(this.jTableMain.convertRowIndexToModel(this.jTableMain.getSelectedRow()));
+            this.logMessage("Removing item " + item.getId());
+            this.getDataModel().getItemList().remove(this.jTableMain.convertRowIndexToModel(this.jTableMain.getSelectedRow()));
+            ItemTableDataModel model = (ItemTableDataModel) this.getjTableMain().getModel();
+            model.fireTableDataChanged();
+        }
+    }//GEN-LAST:event_jButtonRemoveActionPerformed
 
     
 

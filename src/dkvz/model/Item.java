@@ -27,6 +27,7 @@ public class Item {
     private ArrayList<Item> components = null;
     private boolean refreshed = false;
     private int qty = 0;
+    private List<FixedPriceItem> fixedPriceItems = null;
 
     @Override
     public String toString() {
@@ -58,27 +59,35 @@ public class Item {
     // have the "refreshed" flag really work.
     // A computer that can run Guild Wars 2 should be able to compute this though...
     public double getCraftingCostLow() {
-        if (this.components != null && this.components.size() > 0) {
-            Double cost = 0.0;
+        Double cost = 0.0;
+        if (this.components != null && !this.components.isEmpty()) {
             for (Item item : this.components) {
                 cost += item.getHighestBuyOrder() * item.getQty();
             }
-            return cost;
-        } else {
-            return 0.0;
         }
+        cost += this.getFixedPriceItemsCost();
+        return cost;
+    }
+    
+    public double getFixedPriceItemsCost() {
+        Double cost = 0.0;
+        if (this.fixedPriceItems != null && !this.fixedPriceItems.isEmpty()) {
+            for (FixedPriceItem fItem : this.fixedPriceItems) {
+                cost += fItem.getCost() * fItem.getQty();
+            }
+        }
+        return cost;
     }
     
     public double getCraftingCostHigh() {
-        if (this.components != null && this.components.size() > 0) {
-            Double cost = 0.0;
+        Double cost = 0.0;
+        if (this.components != null && !this.components.isEmpty()) {
             for (Item item : this.components) {
                 cost += item.getLowestSellOrder() * item.getQty();
             }
-            return cost;
-        } else {
-            return 0.0;
         }
+        cost += this.getFixedPriceItemsCost();
+        return cost;
     }
     
     /**
@@ -291,6 +300,20 @@ public class Item {
      */
     public void setLowestProfitFromDirectSelling(double lowestProfitFromDirectSelling) {
         this.lowestProfitFromDirectSelling = lowestProfitFromDirectSelling;
+    }
+
+    /**
+     * @return the fixedPriceItems
+     */
+    public List<FixedPriceItem> getFixedPriceItems() {
+        return fixedPriceItems;
+    }
+
+    /**
+     * @param fixedPriceItems the fixedPriceItems to set
+     */
+    public void setFixedPriceItems(List<FixedPriceItem> fixedPriceItems) {
+        this.fixedPriceItems = fixedPriceItems;
     }
     
 }

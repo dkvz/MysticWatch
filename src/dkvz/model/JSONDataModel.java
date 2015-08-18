@@ -31,6 +31,8 @@ public class JSONDataModel {
     public static final String PROPERTY_QUANTITY = "qty";
     public static final String PROPERTY_CRAFTINGCOSTHIGH = "craftingCostHigh";
     public static final String PROPERTY_CRAFTINGCOSTLOW = "craftingCostLow";
+    public static final String PROPERTY_FIXED_PRICE_ITEMS = "fixedPriceItems";
+    public static final String PROPERTY_FIXED_PRICE_ITEM_COST = "cost";
 
     public JSONDataModel() {
 
@@ -91,6 +93,14 @@ public class JSONDataModel {
         props.put(JSONDataModel.PROPERTY_QUANTITY, item.getQty());
         return props;
     }
+    
+    private HashMap<String, Object> populateFixedPriceItemHashMap(FixedPriceItem item) {
+        HashMap<String, Object> props = new HashMap<String, Object>();
+        props.put(JSONDataModel.PROPERTY_NAME, item.getName());
+        props.put(JSONDataModel.PROPERTY_QUANTITY, item.getQty());
+        props.put(JSONDataModel.PROPERTY_FIXED_PRICE_ITEM_COST, item.getCost());
+        return props;
+    }
 
     public void saveData() throws IOException {
         // Save data to file.
@@ -116,6 +126,14 @@ public class JSONDataModel {
                     compoList.add(this.populateComponentsHashMap(compo));
                 }
                 props.put("components", compoList);
+            }
+            if (item.getFixedPriceItems() != null && !item.getFixedPriceItems().isEmpty()) {
+                // Add the fixed price items:
+                ArrayList<HashMap> fixedItemsList = new ArrayList<HashMap>();
+                for (FixedPriceItem fItem : item.getFixedPriceItems()) {
+                    fixedItemsList.add(this.populateFixedPriceItemHashMap(fItem));
+                }
+                props.put(JSONDataModel.PROPERTY_FIXED_PRICE_ITEMS, fixedItemsList);
             }
             list.add(props);
             //}
@@ -190,6 +208,31 @@ public class JSONDataModel {
                                     }
                                     newComp.setComponent(true);
                                     newItem.getComponents().add(newComp);
+                                }
+                            }
+                        }
+                    }
+                    // We need to get the fixed price items:
+                    if (map.get(JSONDataModel.PROPERTY_FIXED_PRICE_ITEMS) != null) {
+                        List<Map> compos = (List<Map>)map.get(JSONDataModel.PROPERTY_FIXED_PRICE_ITEMS);
+                        if (!compos.isEmpty()) {
+                            newItem.setFixedPriceItems(new ArrayList<FixedPriceItem>());
+                            for (Map<String, Object> comp : compos) {
+                                if (comp.get(JSONDataModel.PROPERTY_NAME) != null) {
+                                    FixedPriceItem fItem = new FixedPriceItem();
+                                    fItem.setName((String)comp.get(JSONDataModel.PROPERTY_NAME));
+                                    if (comp.get(JSONDataModel.PROPERTY_QUANTITY) != null) {
+                                        Long qty = (Long)comp.get(JSONDataModel.PROPERTY_QUANTITY);
+                                        fItem.setQty(qty.intValue());
+                                    } else {
+                                        fItem.setQty(0);
+                                    }
+                                    if (comp.get(JSONDataModel.PROPERTY_FIXED_PRICE_ITEM_COST) != null) {
+                                        fItem.setCost((Double)comp.get(JSONDataModel.PROPERTY_FIXED_PRICE_ITEM_COST));
+                                    } else {
+                                        fItem.setCost(0.0);
+                                    }
+                                    newItem.getFixedPriceItems().add(fItem);
                                 }
                             }
                         }

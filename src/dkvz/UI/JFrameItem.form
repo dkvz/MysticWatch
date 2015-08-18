@@ -22,7 +22,7 @@
     <AuxValue name="FormSettings_listenerGenerationStyle" type="java.lang.Integer" value="0"/>
     <AuxValue name="FormSettings_variablesLocal" type="java.lang.Boolean" value="false"/>
     <AuxValue name="FormSettings_variablesModifier" type="java.lang.Integer" value="2"/>
-    <AuxValue name="designerSize" type="java.awt.Dimension" value="-84,-19,0,5,115,114,0,18,106,97,118,97,46,97,119,116,46,68,105,109,101,110,115,105,111,110,65,-114,-39,-41,-84,95,68,20,2,0,2,73,0,6,104,101,105,103,104,116,73,0,5,119,105,100,116,104,120,112,0,0,1,7,0,0,1,-92"/>
+    <AuxValue name="designerSize" type="java.awt.Dimension" value="-84,-19,0,5,115,114,0,18,106,97,118,97,46,97,119,116,46,68,105,109,101,110,115,105,111,110,65,-114,-39,-41,-84,95,68,20,2,0,2,73,0,6,104,101,105,103,104,116,73,0,5,119,105,100,116,104,120,112,0,0,1,18,0,0,1,-23"/>
   </AuxValues>
 
   <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
@@ -69,88 +69,208 @@
         </Constraint>
       </Constraints>
 
-      <Layout>
-        <DimensionLayout dim="0">
-          <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" attributes="0">
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="1" attributes="0">
-                      <Component id="jComboBoxCraftItems" max="32767" attributes="0"/>
+      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
+      <SubComponents>
+        <Container class="javax.swing.JTabbedPane" name="jTabbedPaneItemType">
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
+              <BorderConstraints direction="Center"/>
+            </Constraint>
+          </Constraints>
+
+          <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
+          <SubComponents>
+            <Container class="javax.swing.JPanel" name="jPanelCraftItem">
+              <Constraints>
+                <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
+                  <JTabbedPaneConstraints tabName="Item components (buyable on the TP)">
+                    <Property name="tabTitle" type="java.lang.String" value="Item components (buyable on the TP)"/>
+                  </JTabbedPaneConstraints>
+                </Constraint>
+              </Constraints>
+
+              <Layout>
+                <DimensionLayout dim="0">
+                  <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" attributes="0">
-                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                              <Component id="jLabelCraftID" pref="133" max="32767" attributes="0"/>
-                              <Component id="jTextFieldCraftID" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="jTextFieldCraftID" alignment="0" min="-2" pref="133" max="-2" attributes="0"/>
+                              <Component id="jLabelCraftID" alignment="0" min="-2" pref="104" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" attributes="0">
                                   <Component id="jLabelCraftQty" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="0" pref="52" max="32767" attributes="0"/>
+                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                               </Group>
-                              <Component id="jTextFieldQty" max="32767" attributes="0"/>
+                              <Group type="102" attributes="0">
+                                  <Component id="jTextFieldQty" min="-2" pref="100" max="-2" attributes="0"/>
+                                  <EmptySpace pref="63" max="32767" attributes="0"/>
+                                  <Component id="jButtonCraftAdd" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="jButtonCraftRemove" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                              </Group>
                           </Group>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="jButtonCraftAdd" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="jButtonCraftRemove" min="-2" max="-2" attributes="0"/>
                       </Group>
                   </Group>
-                  <EmptySpace min="-2" max="-2" attributes="0"/>
-              </Group>
-          </Group>
-        </DimensionLayout>
-        <DimensionLayout dim="1">
-          <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" alignment="0" attributes="0">
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="jLabelCraftID" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="jLabelCraftQty" alignment="3" min="-2" max="-2" attributes="0"/>
+                </DimensionLayout>
+                <DimensionLayout dim="1">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" alignment="1" attributes="0">
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="jLabelCraftID" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="jLabelCraftQty" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace max="32767" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="jButtonCraftAdd" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="jButtonCraftRemove" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="jTextFieldCraftID" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="jTextFieldQty" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace min="-2" pref="63" max="-2" attributes="0"/>
+                      </Group>
                   </Group>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="jTextFieldCraftID" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="jButtonCraftAdd" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="jButtonCraftRemove" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="jTextFieldQty" alignment="3" min="-2" max="-2" attributes="0"/>
+                </DimensionLayout>
+              </Layout>
+              <SubComponents>
+                <Component class="javax.swing.JLabel" name="jLabelCraftID">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Item ID"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JLabel" name="jLabelCraftQty">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Quantity"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JTextField" name="jTextFieldCraftID">
+                </Component>
+                <Component class="javax.swing.JButton" name="jButtonCraftAdd">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Add/Edit"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonCraftAddActionPerformed"/>
+                  </Events>
+                </Component>
+                <Component class="javax.swing.JButton" name="jButtonCraftRemove">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Remove"/>
+                    <Property name="enabled" type="boolean" value="false"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonCraftRemoveActionPerformed"/>
+                  </Events>
+                </Component>
+                <Component class="javax.swing.JTextField" name="jTextFieldQty">
+                </Component>
+              </SubComponents>
+            </Container>
+            <Container class="javax.swing.JPanel" name="jPanelFixedPriceItems">
+              <Constraints>
+                <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
+                  <JTabbedPaneConstraints tabName="Fixed price items">
+                    <Property name="tabTitle" type="java.lang.String" value="Fixed price items"/>
+                  </JTabbedPaneConstraints>
+                </Constraint>
+              </Constraints>
+
+              <Layout>
+                <DimensionLayout dim="0">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" attributes="0">
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                              <Component id="jTextFieldFixedPriceItemName" max="32767" attributes="0"/>
+                              <Component id="jLabelFixedPriceItemName" pref="158" max="32767" attributes="0"/>
+                          </Group>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                              <Component id="jTextFieldFixedPriceItemQty" max="32767" attributes="0"/>
+                              <Component id="jLabelFixedPriceItemQty" pref="63" max="32767" attributes="0"/>
+                          </Group>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                              <Component id="jTextFieldFixedPriceItemPrice" max="32767" attributes="0"/>
+                              <Component id="jLabelFixedPriceItemPrice" pref="59" max="32767" attributes="0"/>
+                          </Group>
+                          <EmptySpace pref="10" max="32767" attributes="0"/>
+                          <Component id="jButtonFixedItemPriceAdd" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="jButtonFixedPriceItemRemove" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                      </Group>
                   </Group>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jComboBoxCraftItems" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="52" max="32767" attributes="0"/>
-              </Group>
-          </Group>
-        </DimensionLayout>
-      </Layout>
-      <SubComponents>
-        <Component class="javax.swing.JLabel" name="jLabelCraftID">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Item ID"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JLabel" name="jLabelCraftQty">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Quantity"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JTextField" name="jTextFieldCraftID">
-        </Component>
-        <Component class="javax.swing.JButton" name="jButtonCraftAdd">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Add/Edit"/>
-          </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonCraftAddActionPerformed"/>
-          </Events>
-        </Component>
-        <Component class="javax.swing.JButton" name="jButtonCraftRemove">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Remove"/>
-            <Property name="enabled" type="boolean" value="false"/>
-          </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonCraftRemoveActionPerformed"/>
-          </Events>
-        </Component>
+                </DimensionLayout>
+                <DimensionLayout dim="1">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="jLabelFixedPriceItemName" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="jLabelFixedPriceItemQty" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="jLabelFixedPriceItemPrice" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="jTextFieldFixedPriceItemName" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="jTextFieldFixedPriceItemQty" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="jTextFieldFixedPriceItemPrice" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="jButtonFixedItemPriceAdd" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="jButtonFixedPriceItemRemove" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace pref="63" max="32767" attributes="0"/>
+                      </Group>
+                  </Group>
+                </DimensionLayout>
+              </Layout>
+              <SubComponents>
+                <Component class="javax.swing.JLabel" name="jLabelFixedPriceItemName">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Name"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JLabel" name="jLabelFixedPriceItemQty">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Quantity"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JLabel" name="jLabelFixedPriceItemPrice">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Price (g)"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JTextField" name="jTextFieldFixedPriceItemName">
+                </Component>
+                <Component class="javax.swing.JTextField" name="jTextFieldFixedPriceItemQty">
+                </Component>
+                <Component class="javax.swing.JTextField" name="jTextFieldFixedPriceItemPrice">
+                </Component>
+                <Component class="javax.swing.JButton" name="jButtonFixedItemPriceAdd">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Add/Edit"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonFixedItemPriceAddActionPerformed"/>
+                  </Events>
+                </Component>
+                <Component class="javax.swing.JButton" name="jButtonFixedPriceItemRemove">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Remove"/>
+                    <Property name="enabled" type="boolean" value="false"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonFixedPriceItemRemoveActionPerformed"/>
+                  </Events>
+                </Component>
+              </SubComponents>
+            </Container>
+          </SubComponents>
+        </Container>
         <Component class="javax.swing.JComboBox" name="jComboBoxCraftItems">
           <Properties>
             <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
@@ -160,8 +280,11 @@
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jComboBoxCraftItemsActionPerformed"/>
           </Events>
-        </Component>
-        <Component class="javax.swing.JTextField" name="jTextFieldQty">
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
+              <BorderConstraints direction="South"/>
+            </Constraint>
+          </Constraints>
         </Component>
       </SubComponents>
     </Container>

@@ -13,6 +13,7 @@ public class JFrameItem extends javax.swing.JFrame {
     private JFrameMain mainFrame = null;
     private Item itemToModify = null;
     private ArrayList<Item> components = null;
+    private List<FixedPriceItem> fixedPriceItems = null;
 
     /**
      * Creates new form JFrameItem
@@ -24,6 +25,8 @@ public class JFrameItem extends javax.swing.JFrame {
         this.jTextFieldItemID.setEditable(true);
         this.jTextFieldItemID.setEnabled(true);
         this.components = new ArrayList<Item>();
+        this.fixedPriceItems = new ArrayList<FixedPriceItem>();
+        this.jTabbedPaneItemType.setSelectedIndex(0);
     }
 
     public JFrameItem(JFrameMain mainFrame, Item itemToModify) {
@@ -31,6 +34,7 @@ public class JFrameItem extends javax.swing.JFrame {
         initComponents();
         this.itemToModify = itemToModify;
         this.reloadItem();
+        this.jTabbedPaneItemType.setSelectedIndex(0);
     }
 
     public void reloadItem() {
@@ -42,6 +46,15 @@ public class JFrameItem extends javax.swing.JFrame {
             for (Item item : itemToModify.getComponents()) {
                 this.components.add(item);
                 this.jComboBoxCraftItems.addItem(item);
+            }
+        }
+        // New code for the FixedPriceItem debacle:
+        this.fixedPriceItems = new ArrayList<FixedPriceItem>();
+        // I've been running checks against lists count() a lot instead of just using isEmpty().
+        if (itemToModify.getFixedPriceItems() != null && !itemToModify.getFixedPriceItems().isEmpty()) {
+            for (FixedPriceItem fItem : itemToModify.getFixedPriceItems()) {
+                this.fixedPriceItems.add(fItem);
+                this.jComboBoxCraftItems.addItem(fItem);
             }
         }
     }
@@ -58,13 +71,24 @@ public class JFrameItem extends javax.swing.JFrame {
         jLabelItemID = new javax.swing.JLabel();
         jTextFieldItemID = new javax.swing.JTextField();
         jPanelCenter = new javax.swing.JPanel();
+        jTabbedPaneItemType = new javax.swing.JTabbedPane();
+        jPanelCraftItem = new javax.swing.JPanel();
         jLabelCraftID = new javax.swing.JLabel();
         jLabelCraftQty = new javax.swing.JLabel();
         jTextFieldCraftID = new javax.swing.JTextField();
         jButtonCraftAdd = new javax.swing.JButton();
         jButtonCraftRemove = new javax.swing.JButton();
-        jComboBoxCraftItems = new javax.swing.JComboBox();
         jTextFieldQty = new javax.swing.JTextField();
+        jPanelFixedPriceItems = new javax.swing.JPanel();
+        jLabelFixedPriceItemName = new javax.swing.JLabel();
+        jLabelFixedPriceItemQty = new javax.swing.JLabel();
+        jLabelFixedPriceItemPrice = new javax.swing.JLabel();
+        jTextFieldFixedPriceItemName = new javax.swing.JTextField();
+        jTextFieldFixedPriceItemQty = new javax.swing.JTextField();
+        jTextFieldFixedPriceItemPrice = new javax.swing.JTextField();
+        jButtonFixedItemPriceAdd = new javax.swing.JButton();
+        jButtonFixedPriceItemRemove = new javax.swing.JButton();
+        jComboBoxCraftItems = new javax.swing.JComboBox();
         jPanelBottom = new javax.swing.JPanel();
         jButtonOK = new javax.swing.JButton();
         jButtonClose = new javax.swing.JButton();
@@ -88,6 +112,7 @@ public class JFrameItem extends javax.swing.JFrame {
         getContentPane().add(jPanelTop, java.awt.BorderLayout.NORTH);
 
         jPanelCenter.setBorder(javax.swing.BorderFactory.createTitledBorder("Components required to craft item"));
+        jPanelCenter.setLayout(new java.awt.BorderLayout());
 
         jLabelCraftID.setText("Item ID");
 
@@ -108,54 +133,119 @@ public class JFrameItem extends javax.swing.JFrame {
             }
         });
 
+        javax.swing.GroupLayout jPanelCraftItemLayout = new javax.swing.GroupLayout(jPanelCraftItem);
+        jPanelCraftItem.setLayout(jPanelCraftItemLayout);
+        jPanelCraftItemLayout.setHorizontalGroup(
+            jPanelCraftItemLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelCraftItemLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanelCraftItemLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jTextFieldCraftID, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabelCraftID, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanelCraftItemLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanelCraftItemLayout.createSequentialGroup()
+                        .addComponent(jLabelCraftQty)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(jPanelCraftItemLayout.createSequentialGroup()
+                        .addComponent(jTextFieldQty, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 63, Short.MAX_VALUE)
+                        .addComponent(jButtonCraftAdd)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButtonCraftRemove)
+                        .addContainerGap())))
+        );
+        jPanelCraftItemLayout.setVerticalGroup(
+            jPanelCraftItemLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelCraftItemLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanelCraftItemLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabelCraftID)
+                    .addComponent(jLabelCraftQty))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanelCraftItemLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButtonCraftAdd)
+                    .addComponent(jButtonCraftRemove)
+                    .addComponent(jTextFieldCraftID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTextFieldQty, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(63, 63, 63))
+        );
+
+        jTabbedPaneItemType.addTab("Item components (buyable on the TP)", jPanelCraftItem);
+
+        jLabelFixedPriceItemName.setText("Name");
+
+        jLabelFixedPriceItemQty.setText("Quantity");
+
+        jLabelFixedPriceItemPrice.setText("Price (g)");
+
+        jButtonFixedItemPriceAdd.setText("Add/Edit");
+        jButtonFixedItemPriceAdd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonFixedItemPriceAddActionPerformed(evt);
+            }
+        });
+
+        jButtonFixedPriceItemRemove.setText("Remove");
+        jButtonFixedPriceItemRemove.setEnabled(false);
+        jButtonFixedPriceItemRemove.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonFixedPriceItemRemoveActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanelFixedPriceItemsLayout = new javax.swing.GroupLayout(jPanelFixedPriceItems);
+        jPanelFixedPriceItems.setLayout(jPanelFixedPriceItemsLayout);
+        jPanelFixedPriceItemsLayout.setHorizontalGroup(
+            jPanelFixedPriceItemsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelFixedPriceItemsLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanelFixedPriceItemsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jTextFieldFixedPriceItemName)
+                    .addComponent(jLabelFixedPriceItemName, javax.swing.GroupLayout.DEFAULT_SIZE, 158, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanelFixedPriceItemsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jTextFieldFixedPriceItemQty)
+                    .addComponent(jLabelFixedPriceItemQty, javax.swing.GroupLayout.DEFAULT_SIZE, 63, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanelFixedPriceItemsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jTextFieldFixedPriceItemPrice)
+                    .addComponent(jLabelFixedPriceItemPrice, javax.swing.GroupLayout.DEFAULT_SIZE, 59, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 10, Short.MAX_VALUE)
+                .addComponent(jButtonFixedItemPriceAdd)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButtonFixedPriceItemRemove)
+                .addContainerGap())
+        );
+        jPanelFixedPriceItemsLayout.setVerticalGroup(
+            jPanelFixedPriceItemsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelFixedPriceItemsLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanelFixedPriceItemsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabelFixedPriceItemName)
+                    .addComponent(jLabelFixedPriceItemQty)
+                    .addComponent(jLabelFixedPriceItemPrice))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanelFixedPriceItemsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jTextFieldFixedPriceItemName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTextFieldFixedPriceItemQty, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTextFieldFixedPriceItemPrice, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButtonFixedItemPriceAdd)
+                    .addComponent(jButtonFixedPriceItemRemove))
+                .addContainerGap(63, Short.MAX_VALUE))
+        );
+
+        jTabbedPaneItemType.addTab("Fixed price items", jPanelFixedPriceItems);
+
+        jPanelCenter.add(jTabbedPaneItemType, java.awt.BorderLayout.CENTER);
+
         jComboBoxCraftItems.setModel(new DefaultComboBoxModel<Item>());
         jComboBoxCraftItems.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBoxCraftItemsActionPerformed(evt);
             }
         });
-
-        javax.swing.GroupLayout jPanelCenterLayout = new javax.swing.GroupLayout(jPanelCenter);
-        jPanelCenter.setLayout(jPanelCenterLayout);
-        jPanelCenterLayout.setHorizontalGroup(
-            jPanelCenterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanelCenterLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanelCenterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jComboBoxCraftItems, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(jPanelCenterLayout.createSequentialGroup()
-                        .addGroup(jPanelCenterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jLabelCraftID, javax.swing.GroupLayout.DEFAULT_SIZE, 133, Short.MAX_VALUE)
-                            .addComponent(jTextFieldCraftID))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(jPanelCenterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanelCenterLayout.createSequentialGroup()
-                                .addComponent(jLabelCraftQty)
-                                .addGap(0, 52, Short.MAX_VALUE))
-                            .addComponent(jTextFieldQty))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButtonCraftAdd)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButtonCraftRemove)))
-                .addContainerGap())
-        );
-        jPanelCenterLayout.setVerticalGroup(
-            jPanelCenterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanelCenterLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanelCenterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabelCraftID)
-                    .addComponent(jLabelCraftQty))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanelCenterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextFieldCraftID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButtonCraftAdd)
-                    .addComponent(jButtonCraftRemove)
-                    .addComponent(jTextFieldQty, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jComboBoxCraftItems, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(52, Short.MAX_VALUE))
-        );
+        jPanelCenter.add(jComboBoxCraftItems, java.awt.BorderLayout.SOUTH);
 
         getContentPane().add(jPanelCenter, java.awt.BorderLayout.CENTER);
 
@@ -193,12 +283,15 @@ public class JFrameItem extends javax.swing.JFrame {
                 long id = Long.parseLong(this.jTextFieldItemID.getText());
                 itemToModify.setId(id);
                 // Process the components:
-                if (this.components.size() > 0) {
+                if (!this.components.isEmpty()) {
                     itemToModify.setComponents(this.components);
+                }
+                if (!this.fixedPriceItems.isEmpty()) {
+                    itemToModify.setFixedPriceItems(this.fixedPriceItems);
                 }
                 this.mainFrame.getDataModel().addItem(itemToModify);
                 ItemTableDataModel model = (ItemTableDataModel) this.mainFrame.getjTableMain().getModel();
-                model.fireTableRowsInserted(this.mainFrame.getDataModel().count() - 1, this.mainFrame.getDataModel().count() - 1);
+                model.fireTableDataChanged();
                 this.mainFrame.logMessage("Added item " + Long.toString(id) + " - Data Model item count: " + this.mainFrame.getDataModel().count());
             } catch (NumberFormatException ex) {
                 // Could not parse the id.
@@ -210,6 +303,7 @@ public class JFrameItem extends javax.swing.JFrame {
             // We always assign the component list.
             // Because itemToModify is a reference it should work on the dataModel...
             itemToModify.setComponents(this.components);
+            itemToModify.setFixedPriceItems(this.fixedPriceItems);
             ItemTableDataModel model = (ItemTableDataModel) this.mainFrame.getjTableMain().getModel();
             //model.fireTableRowsUpdated(0, this.mainFrame.getDataModel().count());
             // Previous code doesn't work with the sorter, so here goes:
@@ -263,6 +357,15 @@ public class JFrameItem extends javax.swing.JFrame {
         this.jTextFieldCraftID.setText("");
         this.jTextFieldQty.setText("0");
         this.jButtonCraftRemove.setEnabled(false);
+        this.jTabbedPaneItemType.setSelectedIndex(0);
+    }
+    
+    private void resetFixedItemControls() {
+        this.jTextFieldFixedPriceItemName.setText("");
+        this.jTextFieldFixedPriceItemPrice.setText("0");
+        this.jTextFieldFixedPriceItemQty.setText("0");
+        this.jButtonFixedPriceItemRemove.setEnabled(false);
+        this.jTabbedPaneItemType.setSelectedIndex(1);
     }
 
     private void rebuildCombo() {
@@ -270,39 +373,110 @@ public class JFrameItem extends javax.swing.JFrame {
         for (Item item : this.components) {
             this.jComboBoxCraftItems.addItem(item);
         }
+        for (FixedPriceItem fItem : this.fixedPriceItems) {
+            this.jComboBoxCraftItems.addItem(fItem);
+        }
         this.repaint();
+    }
+    
+    private void removeSelected() {
+        if (this.jComboBoxCraftItems.getSelectedItem() != null) {
+            if (this.jComboBoxCraftItems.getSelectedItem() instanceof Item) {
+                Item item = (Item)this.jComboBoxCraftItems.getSelectedItem();
+                // Remove from the other stuff too:
+                for (int i = 0; i < this.components.size(); i++) {
+                    if (this.components.get(i).equals(item)) {
+                        this.components.remove(i);
+                        break;
+                    }
+                }
+                // Rebuild the model for the comboBox...
+                //this.rebuildCombo();
+                // Let's try the builtin method, I suppose it's using equals so it should work:
+                this.jComboBoxCraftItems.removeItem(item);
+                this.resetCraftControls();
+            } else {
+                // Removing a fixed price item:
+                FixedPriceItem fItem = (FixedPriceItem)this.jComboBoxCraftItems.getSelectedItem();
+                for (int i = 0; i < this.fixedPriceItems.size(); i++) {
+                    if (this.fixedPriceItems.get(i).equals(fItem)) {
+                        this.fixedPriceItems.remove(i);
+                        break;
+                    }
+                }
+                this.jComboBoxCraftItems.removeItem(fItem);
+                this.resetFixedItemControls();
+            }
+        }
     }
 
     private void jButtonCraftRemoveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCraftRemoveActionPerformed
-        if (this.jComboBoxCraftItems.getSelectedItem() != null) {
-            Item item = (Item) this.jComboBoxCraftItems.getSelectedItem();
-            // Remove from the other stuff too:
-            for (int i = 0; i < this.components.size(); i++) {
-                if (this.components.get(i).equals(item)) {
-                    this.components.remove(i);
-                    break;
-                }
-            }
-            // Rebuild the model for the comboBox...
-            //this.rebuildCombo();
-            // Let's try the builtin method, I suppose it's using equals so it should work:
-            this.jComboBoxCraftItems.removeItem(item);
-            this.resetCraftControls();
-        }
+        this.removeSelected();
     }//GEN-LAST:event_jButtonCraftRemoveActionPerformed
 
     private void jComboBoxCraftItemsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxCraftItemsActionPerformed
         if (this.jComboBoxCraftItems.getSelectedItem() != null) {
-            Item item = (Item) this.jComboBoxCraftItems.getSelectedItem();
-            this.jTextFieldCraftID.setText(Long.toString(item.getId()));
-            this.jTextFieldQty.setText(Integer.toString(item.getQty()));
-            this.jButtonCraftRemove.setEnabled(true);
+            if (this.jComboBoxCraftItems.getSelectedItem() instanceof Item) {
+                Item item = (Item)this.jComboBoxCraftItems.getSelectedItem();
+                this.jTextFieldCraftID.setText(Long.toString(item.getId()));
+                this.jTextFieldQty.setText(Integer.toString(item.getQty()));
+                this.jButtonCraftRemove.setEnabled(true);
+                this.jTabbedPaneItemType.setSelectedIndex(0);
+            } else {
+                FixedPriceItem fItem = (FixedPriceItem)this.jComboBoxCraftItems.getSelectedItem();
+                this.jTextFieldFixedPriceItemName.setText(fItem.getName());
+                this.jTextFieldFixedPriceItemPrice.setText(Double.toString(fItem.getCost()));
+                this.jTextFieldFixedPriceItemQty.setText(Integer.toString(fItem.getQty()));
+                this.jButtonFixedPriceItemRemove.setEnabled(true);
+                this.jTabbedPaneItemType.setSelectedIndex(1);
+            }
         }
     }//GEN-LAST:event_jComboBoxCraftItemsActionPerformed
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
         this.closeFrame();
     }//GEN-LAST:event_formWindowClosed
+
+    private void jButtonFixedPriceItemRemoveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonFixedPriceItemRemoveActionPerformed
+        this.removeSelected();
+    }//GEN-LAST:event_jButtonFixedPriceItemRemoveActionPerformed
+
+    private void jButtonFixedItemPriceAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonFixedItemPriceAddActionPerformed
+        try {
+            String name = this.jTextFieldFixedPriceItemName.getText();
+            if (name.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please enter a name for the component.");
+                return;
+            }
+            int qty = Integer.parseInt(this.jTextFieldFixedPriceItemQty.getText());
+            if (qty <= 0) {
+                JOptionPane.showMessageDialog(this, "You're trying to add a quantity of 0.");
+                return;
+            }
+            Double cost = Double.parseDouble(this.jTextFieldFixedPriceItemPrice.getText());
+            FixedPriceItem compo = new FixedPriceItem();
+            compo.setName(name);
+            compo.setQty(qty);
+            compo.setCost(cost);
+            // If component already exists we're just changing the quantity:
+            for (int i = 0; i < this.fixedPriceItems.size(); i++) {
+                // Equals just checks the IDs.
+                if (this.fixedPriceItems.get(i).equals(compo)) {
+                    // Already exists, remove and rebuild combo:
+                    // Let's try the built in method:
+                    this.jComboBoxCraftItems.removeItem(this.fixedPriceItems.get(i));
+                    this.fixedPriceItems.remove(i);
+                    break;
+                }
+            }
+            this.fixedPriceItems.add(compo);
+            this.jComboBoxCraftItems.addItem(compo);
+            // Reset the fields when adding worked.
+            this.resetFixedItemControls();
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Could not parse the item ID or price, make sure it's a number.");
+        }
+    }//GEN-LAST:event_jButtonFixedItemPriceAddActionPerformed
 
     /**
      * @return the mainFrame
@@ -323,15 +497,26 @@ public class JFrameItem extends javax.swing.JFrame {
     private javax.swing.JButton jButtonClose;
     private javax.swing.JButton jButtonCraftAdd;
     private javax.swing.JButton jButtonCraftRemove;
+    private javax.swing.JButton jButtonFixedItemPriceAdd;
+    private javax.swing.JButton jButtonFixedPriceItemRemove;
     private javax.swing.JButton jButtonOK;
     private javax.swing.JComboBox jComboBoxCraftItems;
     private javax.swing.JLabel jLabelCraftID;
     private javax.swing.JLabel jLabelCraftQty;
+    private javax.swing.JLabel jLabelFixedPriceItemName;
+    private javax.swing.JLabel jLabelFixedPriceItemPrice;
+    private javax.swing.JLabel jLabelFixedPriceItemQty;
     private javax.swing.JLabel jLabelItemID;
     private javax.swing.JPanel jPanelBottom;
     private javax.swing.JPanel jPanelCenter;
+    private javax.swing.JPanel jPanelCraftItem;
+    private javax.swing.JPanel jPanelFixedPriceItems;
     private javax.swing.JPanel jPanelTop;
+    private javax.swing.JTabbedPane jTabbedPaneItemType;
     private javax.swing.JTextField jTextFieldCraftID;
+    private javax.swing.JTextField jTextFieldFixedPriceItemName;
+    private javax.swing.JTextField jTextFieldFixedPriceItemPrice;
+    private javax.swing.JTextField jTextFieldFixedPriceItemQty;
     private javax.swing.JTextField jTextFieldItemID;
     private javax.swing.JTextField jTextFieldQty;
     // End of variables declaration//GEN-END:variables
@@ -348,5 +533,12 @@ public class JFrameItem extends javax.swing.JFrame {
      */
     public void setItemToModify(Item itemToModify) {
         this.itemToModify = itemToModify;
+    }
+
+    /**
+     * @return the fixedPriceItems
+     */
+    public List<FixedPriceItem> getFixedPriceItems() {
+        return fixedPriceItems;
     }
 }
