@@ -181,7 +181,7 @@ public class Item {
      * @return the profitFromSellOrder
      */
     public double getProfitFromSellOrder() {
-        this.profitFromSellOrder = this.getLowestSellOrder() - this.getCraftingCostLow();
+        this.profitFromSellOrder = (0.85 * this.getLowestSellOrder()) - this.getCraftingCostLow();
         return this.profitFromSellOrder;
     }
 
@@ -196,7 +196,7 @@ public class Item {
      * @return the profitFromDirectSelling
      */
     public double getProfitFromDirectSelling() {
-        this.profitFromDirectSelling = this.getHighestBuyOrder() - this.getCraftingCostLow();
+        this.profitFromDirectSelling = (0.85 * this.getHighestBuyOrder()) - this.getCraftingCostLow();
         return profitFromDirectSelling;
     }
 

@@ -71,6 +71,11 @@ public class JFrameItem extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Item Details");
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosed(java.awt.event.WindowEvent evt) {
+                formWindowClosed(evt);
+            }
+        });
 
         jPanelTop.setBorder(javax.swing.BorderFactory.createTitledBorder("Add item to list"));
 
@@ -231,7 +236,7 @@ public class JFrameItem extends javax.swing.JFrame {
             }
             Item compo = new Item();
             compo.setComponent(true);
-            compo.setName("Requires update for name");
+            compo.setName("");
             compo.setId(id);
             compo.setQty(qty);
             // If component already exists we're just changing the quantity:
@@ -294,6 +299,10 @@ public class JFrameItem extends javax.swing.JFrame {
             this.jButtonCraftRemove.setEnabled(true);
         }
     }//GEN-LAST:event_jComboBoxCraftItemsActionPerformed
+
+    private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
+        this.closeFrame();
+    }//GEN-LAST:event_formWindowClosed
 
     /**
      * @return the mainFrame

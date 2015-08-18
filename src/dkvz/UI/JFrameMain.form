@@ -85,6 +85,9 @@
           </Properties>
         </Component>
         <Component class="javax.swing.JProgressBar" name="jProgressBarStatus">
+          <Properties>
+            <Property name="maximum" type="int" value="1000"/>
+          </Properties>
         </Component>
       </SubComponents>
     </Container>
@@ -176,8 +179,19 @@
         </Component>
         <Component class="javax.swing.JButton" name="jButtonRefresh">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Refresh Values"/>
+            <Property name="text" type="java.lang.String" value="Refresh All"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonRefreshActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JButton" name="jButtonRefreshSelected">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Refresh Selected"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonRefreshSelectedActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="jButtonSave">
           <Properties>

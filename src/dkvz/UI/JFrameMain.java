@@ -20,6 +20,8 @@ public class JFrameMain extends javax.swing.JFrame {
     
     private JFrameItem itemFrame = null;
     private JSONDataModel dataModel = null;
+    private DataRefresher refresher = null;
+    private Thread refreshThread = null;
     
     /**
      * Creates new form JFrameMain
@@ -49,6 +51,7 @@ public class JFrameMain extends javax.swing.JFrame {
     }
     
     private void loadData() {
+        this.jButtonSecret.setVisible(false);
         try {
             this.logMessage("Loading data...");
             // Try to load the data model from disk.
@@ -84,6 +87,7 @@ public class JFrameMain extends javax.swing.JFrame {
         jButtonRemove = new javax.swing.JButton();
         jButtonModify = new javax.swing.JButton();
         jButtonRefresh = new javax.swing.JButton();
+        jButtonRefreshSelected = new javax.swing.JButton();
         jButtonSave = new javax.swing.JButton();
         jButtonSecret = new javax.swing.JButton();
         jMenuBarMain = new javax.swing.JMenuBar();
@@ -107,6 +111,8 @@ public class JFrameMain extends javax.swing.JFrame {
 
         jLabelStatus.setText("Ready");
         jPanelBottom.add(jLabelStatus);
+
+        jProgressBarStatus.setMaximum(1000);
         jPanelBottom.add(jProgressBarStatus);
 
         getContentPane().add(jPanelBottom, java.awt.BorderLayout.SOUTH);
@@ -154,8 +160,21 @@ public class JFrameMain extends javax.swing.JFrame {
         });
         jPanelTop.add(jButtonModify);
 
-        jButtonRefresh.setText("Refresh Values");
+        jButtonRefresh.setText("Refresh All");
+        jButtonRefresh.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonRefreshActionPerformed(evt);
+            }
+        });
         jPanelTop.add(jButtonRefresh);
+
+        jButtonRefreshSelected.setText("Refresh Selected");
+        jButtonRefreshSelected.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonRefreshSelectedActionPerformed(evt);
+            }
+        });
+        jPanelTop.add(jButtonRefreshSelected);
 
         jButtonSave.setText("Save Data");
         jButtonSave.addActionListener(new java.awt.event.ActionListener() {
@@ -207,8 +226,8 @@ public class JFrameMain extends javax.swing.JFrame {
     private void jButtonAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAddActionPerformed
         if (this.itemFrame == null) {
             this.itemFrame = new JFrameItem(this);
-            this.itemFrame.setVisible(true);
             this.itemFrame.setLocationRelativeTo(null);
+            this.itemFrame.setVisible(true);
             this.itemFrame.toFront();
         } else {
             this.itemFrame.toFront();
@@ -219,7 +238,7 @@ public class JFrameMain extends javax.swing.JFrame {
     private void jButtonModifyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonModifyActionPerformed
         // Find selected item:
         if (this.jTableMain.getSelectedRow() >= 0) {
-            Item item = this.getDataModel().getItemList().get(this.jTableMain.convertRowIndexToView(this.jTableMain.getSelectedRow()));
+            Item item = this.getDataModel().getItemList().get(this.jTableMain.convertRowIndexToModel(this.jTableMain.getSelectedRow()));
             if (this.itemFrame == null) {
                 this.itemFrame = new JFrameItem(this, item);
                 this.itemFrame.setVisible(true);
@@ -281,12 +300,51 @@ public class JFrameMain extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jButtonSecretActionPerformed
 
+    private void refreshAction(boolean selected) {
+        // There's a whole bunch of stuff to reset here.
+        if (this.refreshThread != null && this.refreshThread.isAlive()) {
+            // Cancelling:
+            int dialogResult = JOptionPane.showConfirmDialog (null, "Refresh still in progress, try stopping the operation?", "Refresh data", JOptionPane.YES_NO_OPTION);
+            if (dialogResult == JOptionPane.YES_OPTION) {
+                this.jLabelStatus.setText("Waiting for refresh to stop...");
+                this.refresher.setAbort(true);
+            }
+        } else {
+            // Starting thread:
+            if (selected) {
+                // Refresh only selected item:
+                if (this.jTableMain.getSelectedRow() >= 0) {
+                    Item item = this.getDataModel().getItemList().get(this.jTableMain.convertRowIndexToModel(this.jTableMain.getSelectedRow()));
+                    this.refresher = new DataRefresher(this, item);
+                } else {
+                    // Nothing selected:
+                    JOptionPane.showMessageDialog(this, "You need to select a row first.", "No selection", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+            } else {
+                // Refresh all.
+                this.refresher = new DataRefresher(this);
+            }
+            this.refreshThread = new Thread(this.refresher);
+            this.refreshThread.start();
+        }
+    }
+    
+    private void jButtonRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRefreshActionPerformed
+        this.refreshAction(false);
+    }//GEN-LAST:event_jButtonRefreshActionPerformed
+
+    private void jButtonRefreshSelectedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRefreshSelectedActionPerformed
+        this.refreshAction(true);
+    }//GEN-LAST:event_jButtonRefreshSelectedActionPerformed
+
     
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonAdd;
     private javax.swing.JButton jButtonModify;
     private javax.swing.JButton jButtonRefresh;
+    private javax.swing.JButton jButtonRefreshSelected;
     private javax.swing.JButton jButtonRemove;
     private javax.swing.JButton jButtonSave;
     private javax.swing.JButton jButtonSecret;
@@ -337,5 +395,47 @@ public class JFrameMain extends javax.swing.JFrame {
      */
     public javax.swing.JTable getjTableMain() {
         return jTableMain;
+    }
+
+    /**
+     * @return the jProgressBarStatus
+     */
+    public javax.swing.JProgressBar getjProgressBarStatus() {
+        return jProgressBarStatus;
+    }
+
+    /**
+     * @return the jLabelStatus
+     */
+    public javax.swing.JLabel getjLabelStatus() {
+        return jLabelStatus;
+    }
+
+    /**
+     * @return the refresher
+     */
+    public DataRefresher getRefresher() {
+        return refresher;
+    }
+
+    /**
+     * @param refresher the refresher to set
+     */
+    public void setRefresher(DataRefresher refresher) {
+        this.refresher = refresher;
+    }
+
+    /**
+     * @return the refreshThread
+     */
+    public Thread getRefreshThread() {
+        return refreshThread;
+    }
+
+    /**
+     * @param refreshThread the refreshThread to set
+     */
+    public void setRefreshThread(Thread refreshThread) {
+        this.refreshThread = refreshThread;
     }
 }
