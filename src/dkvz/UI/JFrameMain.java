@@ -78,6 +78,7 @@ public class JFrameMain extends javax.swing.JFrame {
         jLabelStatus = new javax.swing.JLabel();
         jProgressBarStatus = new javax.swing.JProgressBar();
         jPanelCenter = new javax.swing.JPanel();
+        jSplitPaneCenter = new javax.swing.JSplitPane();
         jScrollPaneCenter = new javax.swing.JScrollPane();
         jTableMain = new javax.swing.JTable();
         jScrollPaneLog = new javax.swing.JScrollPane();
@@ -119,6 +120,9 @@ public class JFrameMain extends javax.swing.JFrame {
 
         jPanelCenter.setLayout(new java.awt.BorderLayout());
 
+        jSplitPaneCenter.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+        jSplitPaneCenter.setResizeWeight(1.0);
+
         jTableMain.setAutoCreateRowSorter(true);
         jTableMain.setModel(new ItemTableDataModel(this.dataModel));
         jTableMain.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -128,14 +132,16 @@ public class JFrameMain extends javax.swing.JFrame {
         });
         jScrollPaneCenter.setViewportView(jTableMain);
 
-        jPanelCenter.add(jScrollPaneCenter, java.awt.BorderLayout.CENTER);
+        jSplitPaneCenter.setTopComponent(jScrollPaneCenter);
 
         jTextAreaLog.setEditable(false);
         jTextAreaLog.setColumns(20);
         jTextAreaLog.setRows(5);
         jScrollPaneLog.setViewportView(jTextAreaLog);
 
-        jPanelCenter.add(jScrollPaneLog, java.awt.BorderLayout.SOUTH);
+        jSplitPaneCenter.setBottomComponent(jScrollPaneLog);
+
+        jPanelCenter.add(jSplitPaneCenter, java.awt.BorderLayout.CENTER);
 
         getContentPane().add(jPanelCenter, java.awt.BorderLayout.CENTER);
 
@@ -378,6 +384,7 @@ public class JFrameMain extends javax.swing.JFrame {
     private javax.swing.JProgressBar jProgressBarStatus;
     private javax.swing.JScrollPane jScrollPaneCenter;
     private javax.swing.JScrollPane jScrollPaneLog;
+    private javax.swing.JSplitPane jSplitPaneCenter;
     private javax.swing.JTable jTableMain;
     private javax.swing.JTextArea jTextAreaLog;
     // End of variables declaration//GEN-END:variables

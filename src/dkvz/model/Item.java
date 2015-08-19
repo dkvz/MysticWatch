@@ -25,6 +25,10 @@ public class Item {
     private double lowestProfitFromDirectSelling = 0.0;
     private boolean component = false;
     private ArrayList<Item> components = null;
+    /**
+     * Many of my projects used to have a "booléen qui sert à rien", this
+     * is the one right here:
+     */
     private boolean refreshed = false;
     private int qty = 0;
     private List<FixedPriceItem> fixedPriceItems = null;
