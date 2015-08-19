@@ -2,6 +2,7 @@ package dkvz.UI;
 
 import dkvz.model.*;
 import java.io.IOException;
+import java.util.*;
 import org.json.simple.parser.ParseException;
 
 /**
@@ -13,12 +14,13 @@ public class DataRefresher implements Runnable {
     private JFrameMain mainFrame = null;
     private boolean abort = false;
     private final Item singleItem;
+    private Map<Long, Item> componentsCache = null;
 
     public DataRefresher(JFrameMain mainFrame) {
         this.mainFrame = mainFrame;
         this.singleItem = null;
     }
-    
+
     public DataRefresher(JFrameMain mainFrame, Item item) {
         this.mainFrame = mainFrame;
         this.singleItem = item;
@@ -30,6 +32,8 @@ public class DataRefresher implements Runnable {
         if (this.singleItem != null) {
             this.refreshSingleItem(this.singleItem);
         } else {
+            // When we refresh the whole list we're using the cache:
+            this.componentsCache = new HashMap<Long, Item>();
             this.refreshData();
         }
     }
@@ -42,7 +46,7 @@ public class DataRefresher implements Runnable {
         try {
             this.mainFrame.getjLabelStatus().setText("Updating values from API...");
             this.mainFrame.logMessage("Starting updating values from API for item " + item.getId() + "...");
-            
+
             // Get the item name:
             try {
                 this.refreshName(item);
@@ -66,7 +70,7 @@ public class DataRefresher implements Runnable {
                 progress += 50;
                 this.mainFrame.getjProgressBarStatus().setValue(progress);
             }
-            
+
         } finally {
             this.mainFrame.getjLabelStatus().setText("Values updated");
             this.mainFrame.logMessage("Finished updating values from API.");
@@ -106,18 +110,42 @@ public class DataRefresher implements Runnable {
             ex.printStackTrace();
         }
     }
+    
+    private void saveItemInCache(Item item) {
+        if (this.componentsCache != null) {
+            this.componentsCache.put(item.getId(), item);
+        }
+    }
 
+    // There could be a sort of cache for component prices, it's always the same components coming into play.
     private void refreshComponents(Item item) {
         if (item.getComponents() != null && item.getComponents().size() > 0) {
             for (Item compo : item.getComponents()) {
                 try {
+                    // Check if we can use the cache:
+                    Item cached = null;
+                    if (this.componentsCache != null) {
+                        cached = this.componentsCache.get(compo.getId());
+                    }
                     if (compo.getName() == null || compo.getName().isEmpty()) {
-                        String compName = GW2APIHelper.getItemName(compo.getId());
-                        if (compName != null && !compName.isEmpty()) {
-                            compo.setName(compName);
+                        if (cached != null && cached.getName() != null) {
+                            compo.setName(cached.getName());
+                        } else {
+                            String compName = GW2APIHelper.getItemName(compo.getId());
+                            if (compName != null && !compName.isEmpty()) {
+                                compo.setName(compName);
+                            }
                         }
                     }
-                    GW2APIHelper.getSupplyDemandHighBuyLowSellForItem(compo);
+                    if (cached != null) {
+                        compo.setSupply(cached.getSupply());
+                        compo.setDemand(cached.getDemand());
+                        compo.setLowestSellOrder(cached.getLowestSellOrder());
+                        compo.setHighestBuyOrder(cached.getHighestBuyOrder());
+                    } else {
+                        GW2APIHelper.getSupplyDemandHighBuyLowSellForItem(compo);
+                        this.saveItemInCache(compo);
+                    }
                 } catch (IOException ex) {
                     this.mainFrame.logMessage("ERROR getting info for component " + compo.getId() + " IOException - Check network connection");
                 } catch (ParseException ex) {

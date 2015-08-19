@@ -221,6 +221,7 @@ public class JFrameMain extends javax.swing.JFrame {
 
     private void jMenuItemExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemExitActionPerformed
         // Quit application, make checks before exiting.
+        this.confirmSaveDataBeforeClosing();
         MysticWatch.exitApplication();
     }//GEN-LAST:event_jMenuItemExitActionPerformed
 
@@ -281,12 +282,16 @@ public class JFrameMain extends javax.swing.JFrame {
         this.saveModel();
     }//GEN-LAST:event_jButtonSaveActionPerformed
 
-    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+    private void confirmSaveDataBeforeClosing() {
         // Ask to save data before quitting:
         int dialogResult = JOptionPane.showConfirmDialog (null, "Do you want to save your data?", "Save data", JOptionPane.YES_NO_OPTION);
         if (dialogResult == JOptionPane.YES_OPTION) {
             this.saveModel();
         }
+    }
+    
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        this.confirmSaveDataBeforeClosing();
     }//GEN-LAST:event_formWindowClosing
 
     private void jButtonSecretActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSecretActionPerformed

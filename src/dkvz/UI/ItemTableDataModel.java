@@ -12,7 +12,7 @@ public class ItemTableDataModel extends AbstractTableModel {
 
     private JSONDataModel dataModel = null;
     private final String [] columnNames = {
-      "Item ID", "Name", "Supply", "Demand", "Highest buy order", "Lowest sell order", 
+      "Item ID", "Name", "Supply", "Demand", "Ratio", "Highest buy order", "Lowest sell order", 
         "Crafting cost low", "Crafting cost high", "Profit sell order", "Profit direct selling"
     };
     
@@ -54,21 +54,24 @@ public class ItemTableDataModel extends AbstractTableModel {
                 value = item.getDemand();
                 break;
             case 4:
-                value = item.getHighestBuyOrder();
+                value = item.getSupplyDemandRatio();
                 break;
             case 5:
-                value = item.getLowestSellOrder();
+                value = item.getHighestBuyOrder();
                 break;
             case 6:
-                value = item.getCraftingCostLow();
+                value = item.getLowestSellOrder();
                 break;
             case 7:
-                value = item.getCraftingCostHigh();
+                value = item.getCraftingCostLow();
                 break;
             case 8:
-                value = item.getProfitFromSellOrder();
+                value = item.getCraftingCostHigh();
                 break;
             case 9:
+                value = item.getProfitFromSellOrder();
+                break;
+            case 10:
                 value = item.getProfitFromDirectSelling();
                 break;
         }

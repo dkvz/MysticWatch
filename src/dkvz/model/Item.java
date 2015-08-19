@@ -90,6 +90,14 @@ public class Item {
         return cost;
     }
     
+    public double getSupplyDemandRatio() {
+        if (this.getDemand() > 0) {
+            return (double)this.offer / this.demand;
+        } else {
+            return 0.0;
+        }
+    }
+    
     /**
      * @return the id
      */
