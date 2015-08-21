@@ -18,8 +18,8 @@ public class TPEvent {
     public static final int EVENT_TYPE_NEW_BUY_LISTING = 6;
     public static final int EVENT_TYPE_NEW_SELL_LISTING = 7;
     
-    private long id = -1;
-    private int eventType;
+    private final long id;
+    private final int eventType;
     private double previousPrice;
     private double newPrice;
     private long listingCount;
@@ -28,11 +28,17 @@ public class TPEvent {
     public TPEvent(long id, int eventType) {
         this.id = id;
         this.eventType = eventType;
+        this.date = new Date();
     }
     
     public TPEvent(Item item, int eventType) {
-        this.id = item.getId();
-        this.eventType = eventType;
+        this(item.getId(), eventType);
+        this.date = new Date();
+    }
+    
+    public TPEvent(long id, int eventType, Date date) {
+        this(id, eventType);
+        this.date = date;
     }
     
     /**
@@ -43,24 +49,10 @@ public class TPEvent {
     }
 
     /**
-     * @param id the id to set
-     */
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    /**
      * @return the eventType
      */
     public int getEventType() {
         return eventType;
-    }
-
-    /**
-     * @param eventType the eventType to set
-     */
-    public void setEventType(int eventType) {
-        this.eventType = eventType;
     }
 
     /**
