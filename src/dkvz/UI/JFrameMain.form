@@ -227,6 +227,31 @@
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonSecretActionPerformed"/>
           </Events>
         </Component>
+        <Component class="javax.swing.JSeparator" name="jSeparator1">
+          <Properties>
+            <Property name="orientation" type="int" value="1"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="jLabelTrnLogging">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Transaction logging:"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JButton" name="jButtonTrnLoggingStartSelected">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Start for Selected"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JButton" name="jButtonTrnLoggingStartAll">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Start for All"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JButton" name="jButtonShowTrnLoggingFrame">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Show Log Window"/>
+          </Properties>
+        </Component>
       </SubComponents>
     </Container>
   </SubComponents>

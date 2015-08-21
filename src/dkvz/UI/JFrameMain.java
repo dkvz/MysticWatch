@@ -91,6 +91,11 @@ public class JFrameMain extends javax.swing.JFrame {
         jButtonRefreshSelected = new javax.swing.JButton();
         jButtonSave = new javax.swing.JButton();
         jButtonSecret = new javax.swing.JButton();
+        jSeparator1 = new javax.swing.JSeparator();
+        jLabelTrnLogging = new javax.swing.JLabel();
+        jButtonTrnLoggingStartSelected = new javax.swing.JButton();
+        jButtonTrnLoggingStartAll = new javax.swing.JButton();
+        jButtonShowTrnLoggingFrame = new javax.swing.JButton();
         jMenuBarMain = new javax.swing.JMenuBar();
         jMenuFile = new javax.swing.JMenu();
         jMenuItemExit = new javax.swing.JMenuItem();
@@ -202,6 +207,21 @@ public class JFrameMain extends javax.swing.JFrame {
             }
         });
         jPanelTop.add(jButtonSecret);
+
+        jSeparator1.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jPanelTop.add(jSeparator1);
+
+        jLabelTrnLogging.setText("Transaction logging:");
+        jPanelTop.add(jLabelTrnLogging);
+
+        jButtonTrnLoggingStartSelected.setText("Start for Selected");
+        jPanelTop.add(jButtonTrnLoggingStartSelected);
+
+        jButtonTrnLoggingStartAll.setText("Start for All");
+        jPanelTop.add(jButtonTrnLoggingStartAll);
+
+        jButtonShowTrnLoggingFrame.setText("Show Log Window");
+        jPanelTop.add(jButtonShowTrnLoggingFrame);
 
         getContentPane().add(jPanelTop, java.awt.BorderLayout.NORTH);
 
@@ -374,7 +394,11 @@ public class JFrameMain extends javax.swing.JFrame {
     private javax.swing.JButton jButtonRemove;
     private javax.swing.JButton jButtonSave;
     private javax.swing.JButton jButtonSecret;
+    private javax.swing.JButton jButtonShowTrnLoggingFrame;
+    private javax.swing.JButton jButtonTrnLoggingStartAll;
+    private javax.swing.JButton jButtonTrnLoggingStartSelected;
     private javax.swing.JLabel jLabelStatus;
+    private javax.swing.JLabel jLabelTrnLogging;
     private javax.swing.JMenuBar jMenuBarMain;
     private javax.swing.JMenu jMenuFile;
     private javax.swing.JMenuItem jMenuItemExit;
@@ -384,6 +408,7 @@ public class JFrameMain extends javax.swing.JFrame {
     private javax.swing.JProgressBar jProgressBarStatus;
     private javax.swing.JScrollPane jScrollPaneCenter;
     private javax.swing.JScrollPane jScrollPaneLog;
+    private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSplitPane jSplitPaneCenter;
     private javax.swing.JTable jTableMain;
     private javax.swing.JTextArea jTextAreaLog;
