@@ -29,7 +29,12 @@ public class TPTransactionLog {
         SimpleDateFormat format = new SimpleDateFormat("dd:MM:yyyy HH:mm:ss");
 	String dateToStr = format.format(new Date());
         String line = dateToStr.concat(TPTransactionLog.SEPARATOR); // Continue
-        
+        // Now it depends on the type of event:
+        switch (event.getEventType()) {
+            
+            default:
+                
+        }
     }
     
 }
