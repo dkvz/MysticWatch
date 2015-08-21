@@ -3,6 +3,7 @@ package dkvz.model;
 
 import java.io.*;
 import java.nio.file.*;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -25,6 +26,9 @@ public class TPTransactionLog {
         } else {
             opt = StandardOpenOption.CREATE_NEW;
         }
+        SimpleDateFormat format = new SimpleDateFormat("dd:MM:yyyy HH:mm:ss");
+	String dateToStr = format.format(new Date());
+        String line = dateToStr.concat(TPTransactionLog.SEPARATOR); // Continue
         
     }
     
