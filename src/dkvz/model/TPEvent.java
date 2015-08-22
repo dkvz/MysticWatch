@@ -23,6 +23,7 @@ public class TPEvent {
     private double previousPrice;
     private double newPrice;
     private long listingCount;
+    private long previousListingCount;
     private Date date;
 
     public TPEvent(long id, int eventType) {
@@ -109,6 +110,28 @@ public class TPEvent {
      */
     public void setDate(Date date) {
         this.date = date;
+    }
+
+    /**
+     * @return the previousListingCount
+     */
+    public long getPreviousListingCount() {
+        return previousListingCount;
+    }
+    
+    public Long getNewListingCount() {
+        return this.listingCount;
+    }
+    
+    public void setNewListingCount(long newListingCount) {
+        this.listingCount = newListingCount;
+    }
+
+    /**
+     * @param previousListingCount the previousListingCount to set
+     */
+    public void setPreviousListingCount(long previousListingCount) {
+        this.previousListingCount = previousListingCount;
     }
     
 }

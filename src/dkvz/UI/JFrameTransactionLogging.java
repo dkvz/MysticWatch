@@ -41,10 +41,12 @@ public class JFrameTransactionLogging extends javax.swing.JFrame {
         jButtonDeleteLog = new javax.swing.JButton();
         jButtonClose = new javax.swing.JButton();
         jSplitPaneCenter = new javax.swing.JSplitPane();
-        jScrollPanelLog = new javax.swing.JScrollPane();
-        jTextAreaLog = new javax.swing.JTextArea();
         jScrollPaneTable = new javax.swing.JScrollPane();
         jTableTransactionLog = new javax.swing.JTable();
+        jPanelBottom = new javax.swing.JPanel();
+        jScrollPanelLog = new javax.swing.JScrollPane();
+        jTextAreaLog = new javax.swing.JTextArea();
+        jProgressBarLog = new javax.swing.JProgressBar();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Transaction Logging");
@@ -76,12 +78,6 @@ public class JFrameTransactionLogging extends javax.swing.JFrame {
         jSplitPaneCenter.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
         jSplitPaneCenter.setResizeWeight(1.0);
 
-        jTextAreaLog.setColumns(20);
-        jTextAreaLog.setRows(5);
-        jScrollPanelLog.setViewportView(jTextAreaLog);
-
-        jSplitPaneCenter.setBottomComponent(jScrollPanelLog);
-
         jTableTransactionLog.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -96,6 +92,17 @@ public class JFrameTransactionLogging extends javax.swing.JFrame {
         jScrollPaneTable.setViewportView(jTableTransactionLog);
 
         jSplitPaneCenter.setTopComponent(jScrollPaneTable);
+
+        jPanelBottom.setLayout(new java.awt.BorderLayout());
+
+        jTextAreaLog.setColumns(20);
+        jTextAreaLog.setRows(5);
+        jScrollPanelLog.setViewportView(jTextAreaLog);
+
+        jPanelBottom.add(jScrollPanelLog, java.awt.BorderLayout.CENTER);
+        jPanelBottom.add(jProgressBarLog, java.awt.BorderLayout.SOUTH);
+
+        jSplitPaneCenter.setBottomComponent(jPanelBottom);
 
         getContentPane().add(jSplitPaneCenter, java.awt.BorderLayout.CENTER);
 
@@ -114,7 +121,9 @@ public class JFrameTransactionLogging extends javax.swing.JFrame {
     private javax.swing.JButton jButtonStartStopLogging;
     private javax.swing.JButton jButtonStopAllLogging;
     private javax.swing.JComboBox jComboBoxTransactionFile;
+    private javax.swing.JPanel jPanelBottom;
     private javax.swing.JPanel jPanelTop;
+    private javax.swing.JProgressBar jProgressBarLog;
     private javax.swing.JScrollPane jScrollPaneTable;
     private javax.swing.JScrollPane jScrollPanelLog;
     private javax.swing.JSplitPane jSplitPaneCenter;
