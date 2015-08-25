@@ -92,7 +92,8 @@ public class TPTransactionLog {
                                 event.setNewPrice(Double.parseDouble(values[2]));
                                 event.setNewListingCount(Long.parseLong(values[3]));
                                 break;
-                            case TPEvent.EVENT_TYPE_LISTING_QUANTITY_MODIFIED:
+                            case TPEvent.EVENT_TYPE_BUY_ORDER_LISTING_QUANTITY_MODIFIED:
+                            case TPEvent.EVENT_TYPE_SELL_ORDER_LISTING_QUANTITY_MODIFIED:
                                 // Item price ; Prev lising count ; New listing count
                                 event.setPreviousPrice(Double.parseDouble(values[0]));
                                 event.setPreviousListingCount(Long.parseLong(values[1]));
@@ -117,9 +118,18 @@ public class TPTransactionLog {
         return event;
     }
    
-    public static void appendToLog(TPEvent event) throws IOException {
+    public static void appendToLog(TPEvent event) throws IOException, SecurityException {
         // If log file does not exist, try to create it.
         // We'll have to throw a whole bunch of exceptions.
+        // Check for folder existence:
+        File folder = new File(TPTransactionLog.PATH_TRANSACTION_LOG);
+        if (!folder.exists()) {
+            // Create the folder:
+            folder.mkdir();
+        } else if (!folder.isDirectory()) {
+            // That's a big problem, not deleting that file that's not a directory.
+            throw new IOException("The log path " + TPTransactionLog.PATH_TRANSACTION_LOG + " exists but is not a directory. Cannot log data.");
+        }
         File file = new File(TPTransactionLog.PATH_TRANSACTION_LOG.concat(Long.toString(event.getId()).concat(TPTransactionLog.LOG_EXTENSION)));
         StandardOpenOption opt = null;
         if (file.exists()) {
@@ -140,7 +150,8 @@ public class TPTransactionLog {
                         .concat(TPTransactionLog.VALUES_SEPARATOR).concat(Double.toString(event.getPreviousPrice())).concat(TPTransactionLog.VALUES_SEPARATOR)
                         .concat(Long.toString(event.getPreviousListingCount()));
                 break;
-            case TPEvent.EVENT_TYPE_LISTING_QUANTITY_MODIFIED:
+            case TPEvent.EVENT_TYPE_BUY_ORDER_LISTING_QUANTITY_MODIFIED:
+            case TPEvent.EVENT_TYPE_SELL_ORDER_LISTING_QUANTITY_MODIFIED:
                 // Item price ; Prev lising count ; New listing count
                 line = line.concat(Double.toString(event.getPreviousPrice())).concat(TPTransactionLog.VALUES_SEPARATOR).concat(Long.toString(event.getPreviousListingCount()))
                         .concat(TPTransactionLog.VALUES_SEPARATOR).concat(Long.toString(event.getNewListingCount()));

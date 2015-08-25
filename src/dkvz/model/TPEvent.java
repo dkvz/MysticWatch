@@ -12,7 +12,8 @@ public class TPEvent {
     public static final int EVENT_TYPE_ERROR = 0;
     public static final int EVENT_TYPE_LOGGING_STARTED = 1;
     public static final int EVENT_TYPE_LOGGING_STOPPED = 2;
-    public static final int EVENT_TYPE_LISTING_QUANTITY_MODIFIED = 3;
+    public static final int EVENT_TYPE_SELL_ORDER_LISTING_QUANTITY_MODIFIED = 3;
+    public static final int EVENT_TYPE_BUY_ORDER_LISTING_QUANTITY_MODIFIED = 8;
     public static final int EVENT_TYPE_LOWEST_SELL_ORDER_CHANGED = 4;
     public static final int EVENT_TYPE_HIGHEST_BUY_ORDER_CHANGED = 5;
     public static final int EVENT_TYPE_NEW_BUY_LISTING = 6;
@@ -119,7 +120,7 @@ public class TPEvent {
         return previousListingCount;
     }
     
-    public Long getNewListingCount() {
+    public long getNewListingCount() {
         return this.listingCount;
     }
     

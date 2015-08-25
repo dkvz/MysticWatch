@@ -22,6 +22,7 @@ public class JFrameMain extends javax.swing.JFrame {
     private JSONDataModel dataModel = null;
     private DataRefresher refresher = null;
     private Thread refreshThread = null;
+    private JFrameTransactionLogging logFrame = null;
     
     /**
      * Creates new form JFrameMain
@@ -104,11 +105,11 @@ public class JFrameMain extends javax.swing.JFrame {
         setTitle("Mystic Watch");
         setSize(new java.awt.Dimension(0, 0));
         addWindowListener(new java.awt.event.WindowAdapter() {
-            public void windowClosing(java.awt.event.WindowEvent evt) {
-                formWindowClosing(evt);
-            }
             public void windowClosed(java.awt.event.WindowEvent evt) {
                 formWindowClosed(evt);
+            }
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
             }
         });
 
@@ -221,6 +222,11 @@ public class JFrameMain extends javax.swing.JFrame {
         jPanelTop.add(jButtonTrnLoggingStartAll);
 
         jButtonShowTrnLoggingFrame.setText("Show Log Window");
+        jButtonShowTrnLoggingFrame.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonShowTrnLoggingFrameActionPerformed(evt);
+            }
+        });
         jPanelTop.add(jButtonShowTrnLoggingFrame);
 
         getContentPane().add(jPanelTop, java.awt.BorderLayout.NORTH);
@@ -384,6 +390,18 @@ public class JFrameMain extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jButtonRemoveActionPerformed
 
+    private void jButtonShowTrnLoggingFrameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonShowTrnLoggingFrameActionPerformed
+        if (this.logFrame == null) {
+            this.logFrame = new JFrameTransactionLogging(this);
+            this.logFrame.setLocationRelativeTo(null);
+            this.logFrame.setVisible(true);
+            this.logFrame.toFront();
+        } else {
+            this.logFrame.toFront();
+            this.logFrame.repaint();
+        }
+    }//GEN-LAST:event_jButtonShowTrnLoggingFrameActionPerformed
+
     
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -489,5 +507,19 @@ public class JFrameMain extends javax.swing.JFrame {
      */
     public void setRefreshThread(Thread refreshThread) {
         this.refreshThread = refreshThread;
+    }
+
+    /**
+     * @return the logFrame
+     */
+    public JFrameTransactionLogging getLogFrame() {
+        return logFrame;
+    }
+
+    /**
+     * @param logFrame the logFrame to set
+     */
+    public void setLogFrame(JFrameTransactionLogging logFrame) {
+        this.logFrame = logFrame;
     }
 }

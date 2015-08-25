@@ -12,11 +12,27 @@ import javax.swing.*;
  */
 public class JFrameTransactionLogging extends javax.swing.JFrame {
 
+    private JFrameMain mainFrame = null;
+    
     /**
      * Creates new form JFrameTransactionLogging
      */
-    public JFrameTransactionLogging() {
+    public JFrameTransactionLogging(JFrameMain mainFrame) {
         initComponents();
+        this.mainFrame = mainFrame;
+        // Build the list of transaction logs:
+        this.buildComboFromFiles();
+    }
+    
+    public void buildComboFromFiles() {
+        // Looks for .json item transaction state files in the log directory.
+        // This is going to need a whole bunch of try catching.
+        
+    }
+    
+    public void closeFrame() {
+        this.dispose();
+        this.mainFrame.setLogFrame(null);
     }
     
     public void logMessage(String message) {
@@ -50,6 +66,11 @@ public class JFrameTransactionLogging extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Transaction Logging");
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosed(java.awt.event.WindowEvent evt) {
+                formWindowClosed(evt);
+            }
+        });
 
         jPanelTop.setLayout(new javax.swing.BoxLayout(jPanelTop, javax.swing.BoxLayout.X_AXIS));
 
@@ -78,17 +99,8 @@ public class JFrameTransactionLogging extends javax.swing.JFrame {
         jSplitPaneCenter.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
         jSplitPaneCenter.setResizeWeight(1.0);
 
-        jTableTransactionLog.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
+        jTableTransactionLog.setAutoCreateRowSorter(true);
+        jTableTransactionLog.setModel(null);
         jScrollPaneTable.setViewportView(jTableTransactionLog);
 
         jSplitPaneCenter.setTopComponent(jScrollPaneTable);
@@ -111,8 +123,12 @@ public class JFrameTransactionLogging extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCloseActionPerformed
-        this.dispose();
+        this.closeFrame();
     }//GEN-LAST:event_jButtonCloseActionPerformed
+
+    private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
+        this.closeFrame();
+    }//GEN-LAST:event_formWindowClosed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
