@@ -117,6 +117,17 @@ public class TPTransactionLog {
         }
         return event;
     }
+    
+    /**
+     * Static method to read an item name and id from a state file (in JSON)
+     * @param file the JSON state file to process
+     * @return an Item instance with the name and ID set
+     */
+    public static Item readItemFromStateFile(File file) {
+        Item res = null;
+        
+        return res;
+    }
    
     public static void appendToLog(TPEvent event) throws IOException, SecurityException {
         // If log file does not exist, try to create it.

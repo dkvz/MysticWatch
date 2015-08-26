@@ -5,6 +5,7 @@ import dkvz.model.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import javax.swing.*;
+import java.io.*;
 
 /**
  *
@@ -13,6 +14,7 @@ import javax.swing.*;
 public class JFrameTransactionLogging extends javax.swing.JFrame {
 
     private JFrameMain mainFrame = null;
+    private List<Item> comboList = null;
     
     /**
      * Creates new form JFrameTransactionLogging
@@ -27,7 +29,26 @@ public class JFrameTransactionLogging extends javax.swing.JFrame {
     public void buildComboFromFiles() {
         // Looks for .json item transaction state files in the log directory.
         // This is going to need a whole bunch of try catching.
-        
+        this.comboList = new ArrayList<Item>();
+        File logDir = new File(TPTransactionLog.PATH_TRANSACTION_LOG);
+        if (logDir.exists() && logDir.isDirectory()) {
+            File [] fList = logDir.listFiles();
+            if (fList != null) {
+                for (File file : fList) {
+                    // The file needs to be a JSON file:
+                    if (file.getName().toLowerCase().endsWith(".json")) {
+                        // Read the item name and ID from the file.
+                        // If the ID isn't there, ignore that file.
+                        
+                    }
+                }
+            }
+        } else {
+            // We have a big problem: transaction log dir either doesn't exist
+            // or isn't a directory.
+            JOptionPane.showMessageDialog(null, "The transaction log directory (" + TPTransactionLog.PATH_TRANSACTION_LOG + 
+                    ") doesn't exist, or isn't a directory", "Error saving file", JOptionPane.ERROR_MESSAGE);
+        }
     }
     
     public void closeFrame() {
