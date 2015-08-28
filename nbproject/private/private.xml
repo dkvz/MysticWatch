@@ -5,6 +5,7 @@
         <group>
             <file>file:/D:/NetBeansProjects/MysticWatch/src/dkvz/UI/JFrameTransactionLogging.java</file>
             <file>file:/D:/NetBeansProjects/MysticWatch/src/dkvz/model/TPTransactionLog.java</file>
+            <file>file:/D:/NetBeansProjects/MysticWatch/src/dkvz/model/JSONDataModel.java</file>
             <file>file:/D:/NetBeansProjects/MysticWatch/src/dkvz/UI/JFrameMain.java</file>
         </group>
     </open-files>

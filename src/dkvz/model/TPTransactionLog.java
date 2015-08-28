@@ -6,6 +6,8 @@ import java.nio.file.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.*;
 
 /**
  *
@@ -120,12 +122,31 @@ public class TPTransactionLog {
     
     /**
      * Static method to read an item name and id from a state file (in JSON)
-     * @param file the JSON state file to process
+     * @param file the JSON state File to process
      * @return an Item instance with the name and ID set
+     * @throws java.io.IOException If reading the file causes issues
+     * @throws org.json.simple.parser.ParseException is the JSON cannot be parsed accordingly
      */
-    public static Item readItemFromStateFile(File file) {
+    public static Item readItemFromStateFile(File file) throws IOException, org.json.simple.parser.ParseException {
         Item res = null;
-        
+        // First check if the file exists.
+        JSONParser parser = new JSONParser();
+        Object obj = parser.parse(new FileReader(file));
+        try {
+            JSONObject jsonObject = (JSONObject) obj;
+            Long id = (Long)jsonObject.get("id");
+            String name = (String)jsonObject.get("name");
+            if (id == null) {
+                throw new org.json.simple.parser.ParseException(20);
+            } else {
+                if (name == null) name = "";
+                res.setId(id);
+                res.setName(name);
+            }
+        } catch (ClassCastException ex) {
+            ex.printStackTrace();
+            throw new org.json.simple.parser.ParseException(10);
+        }
         return res;
     }
    

@@ -6,6 +6,9 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import javax.swing.*;
 import java.io.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.json.simple.parser.ParseException;
 
 /**
  *
@@ -37,9 +40,17 @@ public class JFrameTransactionLogging extends javax.swing.JFrame {
                 for (File file : fList) {
                     // The file needs to be a JSON file:
                     if (file.getName().toLowerCase().endsWith(".json")) {
-                        // Read the item name and ID from the file.
-                        // If the ID isn't there, ignore that file.
-                        
+                        try {
+                            // Read the item name and ID from the file.
+                            // If the ID isn't there, ignore that file.
+                            Item item = TPTransactionLog.readItemFromStateFile(file);
+                            this.comboList.add(item);
+                            this.jComboBoxTransactionFile.addItem(item);
+                        } catch (IOException ex) {
+                            this.logMessage("ERROR - Could not read file " + file.getName() + " - Ignored");
+                        } catch (ParseException ex) {
+                            this.logMessage("ERROR - Could not parse JSON for file " + file.getName() + " - Ignored");
+                        }                        
                     }
                 }
             }
