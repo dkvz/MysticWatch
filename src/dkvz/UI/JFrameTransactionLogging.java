@@ -2,19 +2,19 @@
 package dkvz.UI;
 
 import dkvz.model.*;
+import java.awt.Cursor;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import javax.swing.*;
 import java.io.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javax.swing.table.*;
 import org.json.simple.parser.ParseException;
 
 /**
  *
  * @author Alain
  */
-public class JFrameTransactionLogging extends javax.swing.JFrame {
+public class JFrameTransactionLogging extends javax.swing.JFrame implements CanLogMessages {
 
     private JFrameMain mainFrame = null;
     private List<Item> comboList = null;
@@ -34,6 +34,10 @@ public class JFrameTransactionLogging extends javax.swing.JFrame {
         // This is going to need a whole bunch of try catching.
         this.comboList = new ArrayList<Item>();
         File logDir = new File(TPTransactionLog.PATH_TRANSACTION_LOG);
+        if (!logDir.exists()) {
+            // Attempt to create the directory.
+            logDir.mkdir();
+        }
         if (logDir.exists() && logDir.isDirectory()) {
             File [] fList = logDir.listFiles();
             if (fList != null) {
@@ -58,7 +62,8 @@ public class JFrameTransactionLogging extends javax.swing.JFrame {
             // We have a big problem: transaction log dir either doesn't exist
             // or isn't a directory.
             JOptionPane.showMessageDialog(null, "The transaction log directory (" + TPTransactionLog.PATH_TRANSACTION_LOG + 
-                    ") doesn't exist, or isn't a directory", "Error saving file", JOptionPane.ERROR_MESSAGE);
+                    ") is NOT a directory or the directory creation failed.\nYou'll have to manually"
+                    + " create the directory.", "Error saving file", JOptionPane.ERROR_MESSAGE);
         }
     }
     
@@ -67,6 +72,7 @@ public class JFrameTransactionLogging extends javax.swing.JFrame {
         this.mainFrame.setLogFrame(null);
     }
     
+    @Override
     public void logMessage(String message) {
         SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
 	String dateToStr = format.format(new Date());
@@ -107,6 +113,11 @@ public class JFrameTransactionLogging extends javax.swing.JFrame {
         jPanelTop.setLayout(new javax.swing.BoxLayout(jPanelTop, javax.swing.BoxLayout.X_AXIS));
 
         jComboBoxTransactionFile.setModel(new DefaultComboBoxModel<Item>());
+        jComboBoxTransactionFile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBoxTransactionFileActionPerformed(evt);
+            }
+        });
         jPanelTop.add(jComboBoxTransactionFile);
 
         jButtonStartStopLogging.setText("Start Logging");
@@ -132,7 +143,7 @@ public class JFrameTransactionLogging extends javax.swing.JFrame {
         jSplitPaneCenter.setResizeWeight(1.0);
 
         jTableTransactionLog.setAutoCreateRowSorter(true);
-        jTableTransactionLog.setModel(null);
+        jTableTransactionLog.setModel(new DefaultTableModel());
         jScrollPaneTable.setViewportView(jTableTransactionLog);
 
         jSplitPaneCenter.setTopComponent(jScrollPaneTable);
@@ -161,6 +172,34 @@ public class JFrameTransactionLogging extends javax.swing.JFrame {
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
         this.closeFrame();
     }//GEN-LAST:event_formWindowClosed
+
+    private void jComboBoxTransactionFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxTransactionFileActionPerformed
+        // We need to load up the model for the table.
+        if (this.jComboBoxTransactionFile.getSelectedItem() != null) {
+            Cursor initCursor = this.getCursor();
+            try {
+                this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                Item item = (Item)this.jComboBoxTransactionFile.getSelectedItem();
+                // Load the events table:
+                TPTransactionLog tLog = new TPTransactionLog(item.getId());
+                DataLoadingRunnable tpLogLoader = new DataLoadingRunnable(tLog, this);
+                Thread t = new Thread(tpLogLoader);
+                this.jProgressBarLog.setMaximum(110);
+                this.jProgressBarLog.setValue(0);
+                t.start();
+                while (!tLog.isLoaded()) {
+                    this.jProgressBarLog.setValue(tLog.getProgress());
+                }
+                // The file is loaded.
+                // Let's create the data model for the table:
+                TPLogTableDataModel dataModel = new TPLogTableDataModel(tLog);
+                this.jTableTransactionLog.setModel(dataModel);
+                this.jProgressBarLog.setValue(110);
+            } finally {
+                this.setCursor(initCursor);
+            }
+        }
+    }//GEN-LAST:event_jComboBoxTransactionFileActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

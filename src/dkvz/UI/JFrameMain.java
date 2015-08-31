@@ -7,8 +7,6 @@ import java.awt.Cursor;
 import java.io.*;
 import java.util.*;
 import java.text.SimpleDateFormat;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import org.json.simple.parser.ParseException;
 
@@ -16,7 +14,7 @@ import org.json.simple.parser.ParseException;
  *
  * @author william
  */
-public class JFrameMain extends javax.swing.JFrame {
+public class JFrameMain extends javax.swing.JFrame implements CanLogMessages {
     
     private JFrameItem itemFrame = null;
     private JSONDataModel dataModel = null;
@@ -44,6 +42,7 @@ public class JFrameMain extends javax.swing.JFrame {
      * 
      * @param message 
      */
+    @Override
     public void logMessage(String message) {
         SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
 	String dateToStr = format.format(new Date());
@@ -52,7 +51,7 @@ public class JFrameMain extends javax.swing.JFrame {
     }
     
     private void loadData() {
-        this.jButtonSecret.setVisible(false);
+        this.jButtonSecret.setVisible(true);
         try {
             this.logMessage("Loading data...");
             // Try to load the data model from disk.
@@ -328,17 +327,24 @@ public class JFrameMain extends javax.swing.JFrame {
 
     private void jButtonSecretActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSecretActionPerformed
         try {
-            Item item = new Item();
-            item.setId(31065);
-            GW2APIHelper.getSupplyDemandHighBuyLowSellForItem(item);
-            this.logMessage("Item highest buy order: " + item.getHighestBuyOrder());
-            this.logMessage("Item lowest sell order: " + item.getLowestSellOrder());
-            this.logMessage("Item demand: " + item.getDemand());
-            this.logMessage("Item supply: " + item.getOffer());
+            String APIKey = JOptionPane.showInputDialog(this, "Enter API Key", "API Key Requested", JOptionPane.INFORMATION_MESSAGE);
+            if (APIKey != null && !APIKey.isEmpty()) {
+                Date limit = new Date();
+                //limit.setTime(limit.getTime() - (86400*1000));
+                limit.setTime(limit.getTime() - (3600*1000));
+                List<Item> hist = GW2APIHelper.getTPBuyHistory(APIKey, limit);
+                this.logMessage("Found " + hist.size() + " items.");
+                this.logMessage("Items older then " + limit.toString());
+                for (Item item : hist) {
+                    String comp = "Item: " + item.getId() + " ; Qty: " + item.getQty()
+                            + " ; Price: " + item.getHighestBuyOrder() + " ; Time of transaction: " + item.getTransactionEndDate().toString();
+                    this.logMessage(comp);
+                }
+            }
         } catch (IOException ex) {
-            Logger.getLogger(JFrameMain.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ParseException ex) {
-            Logger.getLogger(JFrameMain.class.getName()).log(Level.SEVERE, null, ex);
+            this.logMessage(ex.getMessage());
+        } catch (org.json.simple.parser.ParseException ex) {
+            this.logMessage(ex.getMessage());
         }
     }//GEN-LAST:event_jButtonSecretActionPerformed
 

@@ -22,6 +22,7 @@ public class TPTransactionLog {
     
     private int progress;
     private long itemId;
+    private boolean loaded = false;
     private List<TPEvent> eventListRead = null;
     
     public TPTransactionLog(long itemId) {
@@ -67,6 +68,7 @@ public class TPTransactionLog {
             }
         }
         this.progress = 100;
+        this.loaded = true;
     }
     
     private static TPEvent logLineToEvent(String line, long itemId) {
@@ -240,6 +242,20 @@ public class TPTransactionLog {
      */
     public void setEventListRead(List<TPEvent> eventListRead) {
         this.eventListRead = eventListRead;
+    }
+
+    /**
+     * @return the loaded
+     */
+    public boolean isLoaded() {
+        return loaded;
+    }
+
+    /**
+     * @param loaded the loaded to set
+     */
+    public void setLoaded(boolean loaded) {
+        this.loaded = loaded;
     }
     
 }

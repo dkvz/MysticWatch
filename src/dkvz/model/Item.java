@@ -23,6 +23,8 @@ public class Item {
     private double profitFromDirectSelling = 0.0;
     private double lowestProfitFromSellOrder = 0.0;
     private double lowestProfitFromDirectSelling = 0.0;
+    private Date transactionEndDate = null;
+    private Date transactionStartDate = null;
     private boolean component = false;
     private ArrayList<Item> components = null;
     /**
@@ -326,6 +328,34 @@ public class Item {
      */
     public void setFixedPriceItems(List<FixedPriceItem> fixedPriceItems) {
         this.fixedPriceItems = fixedPriceItems;
+    }
+
+    /**
+     * @return the transactionEndDate
+     */
+    public Date getTransactionEndDate() {
+        return transactionEndDate;
+    }
+
+    /**
+     * @param transactionEndDate the transactionEndDate to set
+     */
+    public void setTransactionEndDate(Date transactionEndDate) {
+        this.transactionEndDate = transactionEndDate;
+    }
+
+    /**
+     * @return the transactionStartDate
+     */
+    public Date getTransactionStartDate() {
+        return transactionStartDate;
+    }
+
+    /**
+     * @param transactionStartDate the transactionStartDate to set
+     */
+    public void setTransactionStartDate(Date transactionStartDate) {
+        this.transactionStartDate = transactionStartDate;
     }
     
 }

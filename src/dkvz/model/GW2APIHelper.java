@@ -2,13 +2,15 @@
 package dkvz.model;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import org.apache.http.*;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.*;
 import org.apache.http.util.EntityUtils;
-import org.json.simple.JSONObject;
+import org.json.simple.*;
 import org.json.simple.parser.JSONParser;
 
 /**
@@ -22,6 +24,7 @@ public class GW2APIHelper {
     public static final String URL_BASE_ITEM = "http://api.guildwars2.com/v2/items/";
     public static final String URL_BASE_LISTINGS = "http://api.guildwars2.com/v2/commerce/listings/";
     public static final String URL_BASE_PRICES = "http://api.guildwars2.com/v2/commerce/prices/";
+    public static final String URL_BASE_TO_HISTORY_BUYS = "https://api.guildwars2.com/v2/commerce/transactions/history/buys";
     
     // Would be smart to set the name only if it's empty, but I'll leave to the logic using this
     // static method.
@@ -94,6 +97,83 @@ public class GW2APIHelper {
             ex.printStackTrace();
             throw new org.json.simple.parser.ParseException(0);
         }
+    }
+    
+    // Quick test I'm doing right now because I need to know if I'm getting the materials for a craft.
+    // Probably going to be quick and dirty.
+    // The API Key has to be provided in the headers.
+    public static List<Item> getTPBuyHistory(String APIKey, Date limit) throws IOException, org.json.simple.parser.ParseException {
+        List<Item> res = new ArrayList<Item>();
+        CloseableHttpClient httpclient = HttpClients.createDefault();
+        String url = GW2APIHelper.URL_BASE_TO_HISTORY_BUYS;
+        HttpGet httpGet = new HttpGet(url);
+        httpGet.addHeader("Authorization", "Bearer ".concat(APIKey));
+        try {
+            CloseableHttpResponse rep = httpclient.execute(httpGet);
+            try {
+                HttpEntity content = rep.getEntity();
+                String data = EntityUtils.toString(content);
+                // We're parsing the thing, until we get to a certain point in the past
+                // (the "limit" date argument).
+                JSONParser parser = new JSONParser();
+                Object obj = parser.parse(data);
+                // This time the response is an array.
+                JSONArray jsonList = (JSONArray) obj;
+                // EXAMPLE: 2015-08-31T10:58:13+00:00
+                DateFormat dateParser = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
+                for (Object it : jsonList) {
+                    JSONObject listIt = (JSONObject) it;
+                    // Parse the "purchased" date first:
+                    Item item = new Item();
+                    Date purchased = null;
+                    if (listIt.get("item_id")!= null) {
+                        Long itemId = (Long)listIt.get("item_id");
+                        item.setId(itemId);
+                        // We're not getting the names here.
+                        try {
+                            String trnDate = (String)listIt.get("purchased");
+                            if (trnDate != null) {
+                                purchased = dateParser.parse(trnDate);
+                            }
+                            if (limit == null || purchased.after(limit)) {
+                                item.setTransactionEndDate(purchased);
+                                String trnStartDate = (String)listIt.get("started");
+                                if (trnStartDate != null) {
+                                    item.setTransactionStartDate(dateParser.parse(trnStartDate));
+                                }
+                                // Get the price too. Set as both values in the item.
+                                Object price = listIt.get("price");
+                                if (price != null) {
+                                    Long priceL = (Long)price;
+                                    double priceD = priceL / 10000.0;
+                                    item.setLowestSellOrder(priceD);
+                                    item.setHighestBuyOrder(priceD);
+                                }
+                                // Get the quantity:
+                                Object qty = listIt.get("quantity");
+                                if (qty != null) {
+                                    Long quantity = (Long)qty;
+                                    item.setQty(quantity.intValue());
+                                }
+                                // Add the item.
+                                res.add(item);
+                            }
+                        } catch (java.text.ParseException ex) {
+                            // We couldn't get a date parsed, abort adding that item.
+                            ex.printStackTrace();
+                            item = null;
+                        }
+                    }
+                }
+                EntityUtils.consume(content);
+            } finally {
+                rep.close();
+            }
+        } catch (ClassCastException ex) {
+            ex.printStackTrace();
+            throw new org.json.simple.parser.ParseException(0);
+        }
+        return res;
     }
     
 }

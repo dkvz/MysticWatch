@@ -10,7 +10,6 @@ Namespace is import org.json.simple.*;
 
 ===== Ideas - Issues =====
   * The system could use an authentication token to check how much money you have in bank and which item you can afford (highlight those?).
-  * Add the column for the supply/demand ratio.
   * In craft components, I should be able to put in fixed price stuff (stuff that you can't get on the TP).
   * Some of the items also require a recipe...
-  * File->Exit does not ask for confirmation.
+  * Make a "name cache", loading on demand when needed to fetch item names. Advanced stuff: provide a way to purge name cache.
