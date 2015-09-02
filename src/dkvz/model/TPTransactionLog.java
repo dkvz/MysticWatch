@@ -30,6 +30,26 @@ public class TPTransactionLog {
         this.progress = 0;
     }
     
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+        if (obj == this) return true;
+        if (!(obj instanceof TPTransactionLog))return false;
+        TPTransactionLog it = (TPTransactionLog)obj;
+        return it.getItemId() == this.getItemId();
+    }
+
+    /**
+     * I don't even know what this is for
+     * @return 
+     */
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 47 * hash + (int) (this.itemId ^ (this.itemId >>> 32));
+        return hash;
+    }
+    
     public void readTransactionLog() throws IOException {
         this.eventListRead = new ArrayList<TPEvent>();
         this.progress = 0;
