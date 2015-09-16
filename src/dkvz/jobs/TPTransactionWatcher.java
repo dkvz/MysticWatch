@@ -1,6 +1,7 @@
 
 package dkvz.jobs;
 
+import dkvz.UI.*;
 import java.util.*;
 import dkvz.model.*;
 
@@ -13,8 +14,10 @@ public class TPTransactionWatcher extends Observable implements Runnable {
     /**
      * Time in milliseconds between API requests.
      */
-    private long requestInterval = 1000;
+    private long requestInterval = 2000;
     private List<TPTransactionLog> transactionLogs = null;
+    private boolean abort = false;
+    private CanLogMessages logger = null;
     
     public TPTransactionWatcher() {
         this.transactionLogs = new ArrayList<TPTransactionLog>();
@@ -28,6 +31,19 @@ public class TPTransactionWatcher extends Observable implements Runnable {
         
         // I'll need a synchronized method to do the actual updating of values.
         
+        for (TPTransactionLog tpLog : this.transactionLogs) {
+            if (this.abort) {
+                break;
+            }
+            
+        }
+        this.logMessage("TP Transaction Watching thread closing...");
+    }
+    
+    private void logMessage(String msg) {
+        if (this.logger != null) {
+            this.logger.logMessage(msg);
+        }
     }
     
     public synchronized void addItemToWatch(Item item) {
@@ -71,6 +87,34 @@ public class TPTransactionWatcher extends Observable implements Runnable {
      */
     public List<TPTransactionLog> getTransactionLogs() {
         return transactionLogs;
+    }
+
+    /**
+     * @return the abort
+     */
+    public boolean isAbort() {
+        return abort;
+    }
+
+    /**
+     * @param abort the abort to set
+     */
+    public void setAbort(boolean abort) {
+        this.abort = abort;
+    }
+
+    /**
+     * @return the logger
+     */
+    public CanLogMessages getLogger() {
+        return logger;
+    }
+
+    /**
+     * @param logger the logger to set
+     */
+    public void setLogger(CanLogMessages logger) {
+        this.logger = logger;
     }
 
     

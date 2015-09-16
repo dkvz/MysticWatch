@@ -88,6 +88,7 @@ public class TPTransactionLog {
             }
         }
         this.progress = 100;
+        this.loadItemState();
         this.loaded = true;
     }
     
@@ -170,6 +171,13 @@ public class TPTransactionLog {
             throw new org.json.simple.parser.ParseException(10);
         }
         return res;
+    }
+    
+    /**
+     * Try to load the state for this transaction logging instance from the state file
+     */
+    public void loadItemState() {
+        
     }
    
     public static void appendToLog(TPEvent event) throws IOException, SecurityException {
