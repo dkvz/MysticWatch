@@ -6,7 +6,7 @@ import java.nio.file.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import org.json.simple.JSONObject;
+import org.json.simple.*;
 import org.json.simple.parser.*;
 
 /**
@@ -24,6 +24,9 @@ public class TPTransactionLog {
     private long itemId;
     private boolean loaded = false;
     private List<TPEvent> eventListRead = null;
+    // Mapping the price to an array with the listings and the quantity listed
+    private Map<Long, Long[]> buys = null;
+    private Map<Long, Long[]> sells = null;
     
     public TPTransactionLog(long itemId) {
         this.itemId = itemId;
@@ -50,7 +53,7 @@ public class TPTransactionLog {
         return hash;
     }
     
-    public void readTransactionLog() throws IOException {
+    public void readTransactionLog() throws IOException, org.json.simple.parser.ParseException {
         this.eventListRead = new ArrayList<TPEvent>();
         this.progress = 0;
         if (this.itemId > 0) {
@@ -176,8 +179,30 @@ public class TPTransactionLog {
     /**
      * Try to load the state for this transaction logging instance from the state file
      */
-    public void loadItemState() {
-        
+    public void loadItemState() throws IOException, org.json.simple.parser.ParseException {
+        this.sells = new HashMap<Long, Long[]>();
+        this.buys = new HashMap<Long, Long[]>();
+        // Check if the file exists:
+        if (this.itemId > 0) {
+            String filPath = TPTransactionLog.PATH_TRANSACTION_LOG.concat(Long.toString(itemId)).concat(".json");
+            File file = new File(filPath);
+            if (file.exists()) {
+                // It does exist.
+                JSONParser parser = new JSONParser();
+                Object obj = parser.parse(new FileReader(file));
+                try {
+                    JSONObject jsonObject = (JSONObject) obj;
+                    // We're looking for two lists: buys and sells.
+                    // Both lists of maps.
+                    JSONArray rdBuys = (JSONArray) jsonObject.get("buys");
+                    JSONArray rdSells = (JSONArray) jsonObject.get("sells");
+                    
+                } catch (ClassCastException ex) {
+                    ex.printStackTrace();
+                    throw new org.json.simple.parser.ParseException(10);
+                }
+            }
+        }
     }
    
     public static void appendToLog(TPEvent event) throws IOException, SecurityException {
