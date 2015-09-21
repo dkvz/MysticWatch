@@ -196,7 +196,9 @@ public class TPTransactionLog {
                     // Both lists of maps.
                     JSONArray rdBuys = (JSONArray) jsonObject.get("buys");
                     JSONArray rdSells = (JSONArray) jsonObject.get("sells");
-                    
+                    for (Object b : rdBuys) {
+                        
+                    }
                 } catch (ClassCastException ex) {
                     ex.printStackTrace();
                     throw new org.json.simple.parser.ParseException(10);
