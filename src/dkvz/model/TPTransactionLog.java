@@ -197,6 +197,17 @@ public class TPTransactionLog {
                     JSONArray rdBuys = (JSONArray) jsonObject.get("buys");
                     JSONArray rdSells = (JSONArray) jsonObject.get("sells");
                     for (Object b : rdBuys) {
+                        Map<String, Long> bb = (Map<String, Long>) b;
+                        Long listings = bb.get("listings");
+                        Long unitPrice = bb.get("unit_price");
+                        Long quantity = bb.get("quantity");
+                        
+                    }
+                    for (Object b : rdSells) {
+                        Map<String, Long> bb = (Map<String, Long>) b;
+                        Long listings = bb.get("listings");
+                        Long unitPrice = bb.get("unit_price");
+                        Long quantity = bb.get("quantity");
                         
                     }
                 } catch (ClassCastException ex) {
