@@ -4,6 +4,10 @@ package dkvz.jobs;
 import dkvz.UI.*;
 import java.util.*;
 import dkvz.model.*;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.json.simple.parser.ParseException;
 
 /**
  *
@@ -35,7 +39,29 @@ public class TPTransactionWatcher extends Observable implements Runnable {
             if (this.abort) {
                 break;
             }
-            
+            // Check if those instances have loaded their data (should be loaded before so we
+            // can easily display the progress on progress bars).
+            if (!tpLog.isLoaded()) {
+                try {
+                    this.logMessage("Transaction log " + tpLog.getItemId() + " has to be loaded...");
+                    tpLog.readTransactionLog();
+                    this.logMessage("Transaction log loaded.");
+                } catch (Exception ex) {
+                    this.logMessage("ERROR - Transaction log for item " + tpLog.getItemId() + " could not be loaded.");
+                    this.logMessage("Removing the item from the watch list.");
+                    this.removeItemToWatch(tpLog.getItemId());
+                }
+            }
+            try {
+                // Load the updated state from the API:
+                TPListings newState = GW2APIHelper.getTPListings(tpLog.getItemId());
+                // We're supposed to compare with the older state to create events... Right?
+                
+            } catch (IOException ex) {
+                this.logMessage("ERROR - IO Exception while looking for listings for item " + tpLog.getItemId());
+            } catch (ParseException ex) {
+                Logger.getLogger("ERROR parsing the JSON in the response from the API for item " + tpLog.getItemId());
+            }
         }
         this.logMessage("TP Transaction Watching thread closing...");
     }

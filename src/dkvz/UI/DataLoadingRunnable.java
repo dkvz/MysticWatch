@@ -3,6 +3,9 @@ package dkvz.UI;
 
 import dkvz.model.*;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.json.simple.parser.ParseException;
 
 /**
  * This is a stupid class just to show a progress bar when I load transaction logs.
@@ -30,6 +33,8 @@ public class DataLoadingRunnable implements Runnable, CanLogMessages {
             transactionLog.readTransactionLog();
         } catch (IOException ex) {
             logMessage("ERROR - Error while reading file for transaction log, item ID " + transactionLog.getItemId());
+        } catch (ParseException ex) {
+            logMessage("ERROR - Parsing exception while reading state file for item ID " + transactionLog.getItemId());
         }
     }
 

@@ -176,4 +176,55 @@ public class GW2APIHelper {
         return res;
     }
     
+    // Method to query for TP listing information.
+    public static TPListings getTPListings(long itemId) throws IOException, org.json.simple.parser.ParseException {
+        TPListings res = new TPListings(itemId);
+        CloseableHttpClient httpclient = HttpClients.createDefault();
+        String url = GW2APIHelper.URL_BASE_LISTINGS.concat(Long.toString(itemId));
+        HttpGet httpGet = new HttpGet(url);
+        try {
+            CloseableHttpResponse rep = httpclient.execute(httpGet);
+            try {
+                HttpEntity content = rep.getEntity();
+                String data = EntityUtils.toString(content);
+                // Let's save the full JSON so it's easier to write to disk later on.
+                // (hopefully).
+                res.setFullJSONData(data);
+                JSONParser parser = new JSONParser();
+                Object obj = parser.parse(data);
+                JSONObject jsonObject = (JSONObject) obj;
+                JSONArray buys = (JSONArray) jsonObject.get("buys");
+                JSONArray sells = (JSONArray) jsonObject.get("sells");
+                // The following could be refactored.
+                for (Object b : buys) {
+                    Map<String, Long> bMap = (Map<String, Long>)b;
+                    Long listings = bMap.get("listings");
+                    Long unitPrice = bMap.get("unit_price");
+                    Long quantity = bMap.get("quantity");
+                    Long [] arr = new Long[2];
+                    arr[0] = listings;
+                    arr[1] = quantity;
+                    res.getBuys().put(unitPrice, arr);
+                }
+                for (Object b : sells) {
+                    Map<String, Long> bMap = (Map<String, Long>)b;
+                    Long listings = bMap.get("listings");
+                    Long unitPrice = bMap.get("unit_price");
+                    Long quantity = bMap.get("quantity");
+                    Long [] arr = new Long[2];
+                    arr[0] = listings;
+                    arr[1] = quantity;
+                    res.getSells().put(unitPrice, arr);
+                }
+                EntityUtils.consume(content);
+            } finally {
+                rep.close();
+            }
+        } catch (ClassCastException ex) {
+            ex.printStackTrace();
+            throw new org.json.simple.parser.ParseException(0);
+        }
+        return res;
+    }
+    
 }

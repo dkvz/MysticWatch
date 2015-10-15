@@ -24,9 +24,7 @@ public class TPTransactionLog {
     private long itemId;
     private boolean loaded = false;
     private List<TPEvent> eventListRead = null;
-    // Mapping the price to an array with the listings and the quantity listed
-    private Map<Long, Long[]> buys = null;
-    private Map<Long, Long[]> sells = null;
+    private TPListings tpListings = null;
     
     public TPTransactionLog(long itemId) {
         this.itemId = itemId;
@@ -178,10 +176,11 @@ public class TPTransactionLog {
     
     /**
      * Try to load the state for this transaction logging instance from the state file
+     * @throws java.io.IOException in case of file input errors
+     * @throws org.json.simple.parser.ParseException in case of class casting error or general JSON parsing errors
      */
     public void loadItemState() throws IOException, org.json.simple.parser.ParseException {
-        this.sells = new HashMap<Long, Long[]>();
-        this.buys = new HashMap<Long, Long[]>();
+        this.tpListings = new TPListings(this.itemId);
         // Check if the file exists:
         if (this.itemId > 0) {
             String filPath = TPTransactionLog.PATH_TRANSACTION_LOG.concat(Long.toString(itemId)).concat(".json");
@@ -196,19 +195,26 @@ public class TPTransactionLog {
                     // Both lists of maps.
                     JSONArray rdBuys = (JSONArray) jsonObject.get("buys");
                     JSONArray rdSells = (JSONArray) jsonObject.get("sells");
+                    // The following redundant code could be refactored but I don't have the motivation.
                     for (Object b : rdBuys) {
                         Map<String, Long> bb = (Map<String, Long>) b;
                         Long listings = bb.get("listings");
                         Long unitPrice = bb.get("unit_price");
                         Long quantity = bb.get("quantity");
-                        
+                        Long [] arr = new Long[2];
+                        arr[0] = listings;
+                        arr[1] = quantity;
+                        this.tpListings.getBuys().put(unitPrice, arr);
                     }
                     for (Object b : rdSells) {
                         Map<String, Long> bb = (Map<String, Long>) b;
                         Long listings = bb.get("listings");
                         Long unitPrice = bb.get("unit_price");
                         Long quantity = bb.get("quantity");
-                        
+                        Long [] arr = new Long[2];
+                        arr[0] = listings;
+                        arr[1] = quantity;
+                        this.tpListings.getSells().put(unitPrice, arr);
                     }
                 } catch (ClassCastException ex) {
                     ex.printStackTrace();
@@ -322,6 +328,13 @@ public class TPTransactionLog {
      */
     public void setLoaded(boolean loaded) {
         this.loaded = loaded;
+    }
+
+    /**
+     * @return the tpListings
+     */
+    public TPListings getTpListings() {
+        return tpListings;
     }
     
 }
