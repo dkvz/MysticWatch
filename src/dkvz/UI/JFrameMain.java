@@ -51,7 +51,7 @@ public class JFrameMain extends javax.swing.JFrame implements CanLogMessages {
     }
     
     private void loadData() {
-        this.jButtonSecret.setVisible(true);
+        this.jButtonSecret.setVisible(false);
         try {
             this.logMessage("Loading data...");
             // Try to load the data model from disk.

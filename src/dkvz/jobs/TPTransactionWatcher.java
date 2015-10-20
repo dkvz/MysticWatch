@@ -13,7 +13,7 @@ import org.json.simple.parser.ParseException;
  *
  * @author Alain
  */
-public class TPTransactionWatcher extends Observable implements Runnable {
+public class TPTransactionWatcher extends Observable implements Runnable, CanLogMessages {
 
     /**
      * Time in milliseconds between API requests.
@@ -56,6 +56,21 @@ public class TPTransactionWatcher extends Observable implements Runnable {
                 // Load the updated state from the API:
                 TPListings newState = GW2APIHelper.getTPListings(tpLog.getItemId());
                 // We're supposed to compare with the older state to create events... Right?
+                // There should be a comparison method in TPListings.
+                List<TPEvent> tpEvents = tpLog.getTpListings().getTPEventsUpToListing(newState);
+                if (!tpEvents.isEmpty()) {
+                    // We got some stuff that happened.
+                    // TODO We should write to the actual file, and also notify the observers of events that may be interresting for
+                    // those.
+                    
+                }
+                
+                // Save the new listing as the current listing.
+                tpLog.setTpListings(newState);
+                // Save the state.
+                // I should remember that I saved the JSON text in the TPListings object, normally. Also
+                // I should add the name of the item in there.
+                // Shit that's getting complicated.
                 
             } catch (IOException ex) {
                 this.logMessage("ERROR - IO Exception while looking for listings for item " + tpLog.getItemId());
@@ -66,7 +81,8 @@ public class TPTransactionWatcher extends Observable implements Runnable {
         this.logMessage("TP Transaction Watching thread closing...");
     }
     
-    private void logMessage(String msg) {
+    @Override
+    public void logMessage(String msg) {
         if (this.logger != null) {
             this.logger.logMessage(msg);
         }

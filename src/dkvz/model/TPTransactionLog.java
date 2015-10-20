@@ -336,5 +336,12 @@ public class TPTransactionLog {
     public TPListings getTpListings() {
         return tpListings;
     }
+
+    /**
+     * @param tpListings the tpListings to set
+     */
+    public void setTpListings(TPListings tpListings) {
+        this.tpListings = tpListings;
+    }
     
 }

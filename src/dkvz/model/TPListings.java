@@ -34,6 +34,109 @@ public class TPListings {
         this.sells.clear();
     }
     
+    public List<TPEvent> getTPEventsUpToListing(TPListings listing) {
+        List<TPEvent> ret = new ArrayList<TPEvent>();
+        /*
+        Let's have a quick list of the event types:
+        EVENT_TYPE_SELL_ORDER_LISTING_QUANTITY_MODIFIED = 3;
+        EVENT_TYPE_BUY_ORDER_LISTING_QUANTITY_MODIFIED = 8;
+        EVENT_TYPE_LOWEST_SELL_ORDER_CHANGED = 4;
+        EVENT_TYPE_HIGHEST_BUY_ORDER_CHANGED = 5;
+        EVENT_TYPE_NEW_BUY_LISTING = 6;
+        EVENT_TYPE_NEW_SELL_LISTING = 7;
+        EVENT_TYPE_BUY_ORDER_GONE = 9;
+        EVENT_TYPE_SELL_ORDER_GONE = 10;
+        */
+        ret.addAll(this.getTPEventsFromListings(listing.getBuys(), this.getBuys(), true));
+        ret.addAll(this.getTPEventsFromListings(listing.getSells(), this.getSells(), false));
+        return ret;
+    }
+    
+    private List<TPEvent> getTPEventsFromListings(Map<Long, Long[]> listing, Map<Long, Long[]> previousListing, boolean buys) {
+        // I'm using the boolean to decide if we're checking buys or sells.
+        // OK this is a bit convoluted, listing is the new listing, previousListing is the... Well previous listing.
+        List<TPEvent> ret = new ArrayList<TPEvent>();
+        long count = 0l;
+        for (Map.Entry<Long, Long[]> entry : listing.entrySet()) {
+            if (count == 0) {
+                // We have special events for the first entries.
+                // Here I just need to know if it was the first entry before.
+                Map.Entry<Long, Long[]> firstEntryBefore = previousListing.entrySet().iterator().next();
+                if (!firstEntryBefore.getKey().equals(entry.getKey())) {
+                    // This wasn't the first entry before, so it's a new top listing.
+                    // It may be a new listing too but that will be checked later on in this loop.
+                    TPEvent event = null;
+                    if (buys) {
+                        event = new TPEvent(this.getItemId(), TPEvent.EVENT_TYPE_HIGHEST_BUY_ORDER_CHANGED);
+                    } else {
+                        event = new TPEvent(this.getItemId(), TPEvent.EVENT_TYPE_LOWEST_SELL_ORDER_CHANGED);
+                    }
+                    event.setValuesFromListingEntries(firstEntryBefore.getKey(), firstEntryBefore.getValue(), entry.getKey(), entry.getValue());
+                    ret.add(event);
+                }
+            }
+            Long[] previousArr = previousListing.get(entry.getKey());
+            if (previousArr != null) {
+                // The listing existed before.
+                // Check if the amount of listings changed (we have no event for the quantity and we don't care):
+                if (!previousArr[0].equals(entry.getValue()[0])) {
+                    // We need to fire the event that means the amount of listings changed:
+                    TPEvent event = null;
+                    if (buys) {
+                        event = new TPEvent(this.getItemId(), TPEvent.EVENT_TYPE_BUY_ORDER_LISTING_QUANTITY_MODIFIED);
+                    } else {
+                        event = new TPEvent(this.getItemId(), TPEvent.EVENT_TYPE_SELL_ORDER_LISTING_QUANTITY_MODIFIED);
+                    }
+                    event.setValuesFromListingEntries(entry.getKey(), previousArr, entry.getKey(), entry.getValue());
+                    ret.add(event);
+                }
+            } else {
+                // We have a new listing.
+                // Let's build an array with zeroes for the previous listings and total quantity:
+                Long [] zeroes = TPListings.makeZeroesValueArray();
+                TPEvent event = null;
+                if (buys) {
+                    event = new TPEvent(this.getItemId(), TPEvent.EVENT_TYPE_NEW_BUY_LISTING);
+                } else {
+                    event = new TPEvent(this.getItemId(), TPEvent.EVENT_TYPE_NEW_SELL_LISTING);
+                }
+                event.setValuesFromListingEntries(0l, zeroes, entry.getKey(), entry.getValue());
+                ret.add(event);
+            }
+            count++;
+        }
+        
+        // We need to check somewhere if listings are gone (listings that were there before).
+        for (Map.Entry<Long, Long[]> entry : previousListing.entrySet()) {
+            Long [] existingArr = listing.get(entry.getKey());
+            if (existingArr == null) {
+                // This entry is no longer there (existingArr is empty btw).
+                Long [] zeroes = TPListings.makeZeroesValueArray();
+                TPEvent event = null;
+                if (buys) {
+                    event = new TPEvent(this.getItemId(), TPEvent.EVENT_TYPE_BUY_ORDER_GONE);
+                } else {
+                    event = new TPEvent(this.getItemId(), TPEvent.EVENT_TYPE_SELL_ORDER_GONE);
+                }
+                event.setValuesFromListingEntries(entry.getKey(), entry.getValue(), 0l, zeroes);
+                ret.add(event);
+            }
+        }
+        
+        return ret;
+    }
+    
+    /**
+     * I just love that method.
+     * @return an Array of Long, dimension 2, with value 0 for both values.
+     */
+    private static Long [] makeZeroesValueArray() {
+        Long [] zeroes = new Long[2];
+        zeroes[0] = 0l;
+        zeroes[1] = 0l;
+        return zeroes;
+    }
+    
     /**
      * @return the buys
      */
@@ -89,7 +192,5 @@ public class TPListings {
     public void setFullJSONData(String fullJSONData) {
         this.fullJSONData = fullJSONData;
     }
-    
-    
-    
+       
 }

@@ -9,6 +9,8 @@ import java.util.*;
  */
 public class TPEvent {
     
+    // A lot of stuff could be final here, this class instances too probably.
+    
     public static final int EVENT_TYPE_ERROR = 0;
     public static final int EVENT_TYPE_LOGGING_STARTED = 1;
     public static final int EVENT_TYPE_LOGGING_STOPPED = 2;
@@ -18,6 +20,8 @@ public class TPEvent {
     public static final int EVENT_TYPE_HIGHEST_BUY_ORDER_CHANGED = 5;
     public static final int EVENT_TYPE_NEW_BUY_LISTING = 6;
     public static final int EVENT_TYPE_NEW_SELL_LISTING = 7;
+    public static final int EVENT_TYPE_BUY_ORDER_GONE = 9;
+    public static final int EVENT_TYPE_SELL_ORDER_GONE = 10;
     
     private final long id;
     private final int eventType;
@@ -25,6 +29,8 @@ public class TPEvent {
     private double newPrice;
     private long listingCount;
     private long previousListingCount;
+    private long quantity;
+    private long previousQuantity;
     private Date date;
 
     public TPEvent(long id, int eventType) {
@@ -64,6 +70,17 @@ public class TPEvent {
         return previousPrice;
     }
 
+    public void setValuesFromListingEntries(Long previousPrice, Long[] previousListingArr, Long newPrice, Long[] newListingArr) {
+        // Set the prices and quantities and amount of listings:
+        this.setPreviousListingCount(previousListingArr[0]);
+        this.setNewListingCount(newListingArr[0]);
+        // Prices are to be converted to double because I started with double. I'm so sorry.
+        this.setPreviousPrice(previousPrice / 10000.0);
+        this.setNewPrice(newPrice / 10000.0);
+        this.setPreviousQuantity(previousListingArr[1]);
+        this.setNewQuantity(newListingArr[1]);
+    }
+    
     /**
      * @param previousPrice the previousPrice to set
      */
@@ -133,6 +150,38 @@ public class TPEvent {
      */
     public void setPreviousListingCount(long previousListingCount) {
         this.previousListingCount = previousListingCount;
+    }
+
+    /**
+     * @return the quantity
+     */
+    public long getQuantity() {
+        return quantity;
+    }
+
+    /**
+     * @param quantity the quantity to set
+     */
+    public void setQuantity(long quantity) {
+        this.quantity = quantity;
+    }
+    
+    public void setNewQuantity(long quantity) {
+        this.setQuantity(quantity);
+    }
+
+    /**
+     * @return the previousQuantity
+     */
+    public long getPreviousQuantity() {
+        return previousQuantity;
+    }
+
+    /**
+     * @param previousQuantity the previousQuantity to set
+     */
+    public void setPreviousQuantity(long previousQuantity) {
+        this.previousQuantity = previousQuantity;
     }
     
 }
