@@ -15,13 +15,20 @@ import org.json.simple.parser.*;
  */
 public class TPTransactionLog {
     
+    // It's important that this path doesn't have path separators anywhere:
     public static final String PATH_TRANSACTION_LOG = "tp_logs";
+    // Extensions should have an excplicit leading ".":
     public static final String LOG_EXTENSION = ".txt";
+    // Extensions should have an excplicit leading ".":
+    public static final String STATE_EXTENSION = ".json";
+    // This is the CSV separator. I don't even know why I'm saving in CSV but whatever.
     public static final String SEPARATOR = ";;";
+    // There is a sub CSV in the CSV (of course) and this is its separator:
     public static final String VALUES_SEPARATOR = "|";
     
     private int progress;
     private long itemId;
+    private String name;
     private boolean loaded = false;
     private List<TPEvent> eventListRead = null;
     private TPListings tpListings = null;
@@ -29,6 +36,7 @@ public class TPTransactionLog {
     public TPTransactionLog(long itemId) {
         this.itemId = itemId;
         this.progress = 0;
+        this.name = "";
     }
     
     @Override
@@ -55,7 +63,7 @@ public class TPTransactionLog {
         this.eventListRead = new ArrayList<TPEvent>();
         this.progress = 0;
         if (this.itemId > 0) {
-            File file = new File(TPTransactionLog.PATH_TRANSACTION_LOG.concat(Long.toString(this.getItemId()).concat(TPTransactionLog.LOG_EXTENSION)));
+            File file = new File(TPTransactionLog.PATH_TRANSACTION_LOG.concat(File.pathSeparator).concat(Long.toString(this.getItemId()).concat(TPTransactionLog.LOG_EXTENSION)));
             if (file.exists()) {
                 try {
                     FileInputStream fstream = new FileInputStream(file);
@@ -112,24 +120,38 @@ public class TPTransactionLog {
                             case TPEvent.EVENT_TYPE_HIGHEST_BUY_ORDER_CHANGED:
                             case TPEvent.EVENT_TYPE_LOWEST_SELL_ORDER_CHANGED:
                                 // Log new highest buy order, previous highest buy order + quantity for reach.
-                                // Order: prev highest buy order ; prev quantity ; new highest buy order ; new quantity
+                                // Order: prev highest buy order ; prev listings ; new highest buy order ; new listings
+                                // Also added quantity later on because the data is available, not sure if I'm going
+                                // to display it though.
                                 event.setPreviousPrice(Double.parseDouble(values[0]));
                                 event.setPreviousListingCount(Long.parseLong(values[1]));
                                 event.setNewPrice(Double.parseDouble(values[2]));
                                 event.setNewListingCount(Long.parseLong(values[3]));
+                                event.setPreviousQuantity(Long.parseLong(values[4]));
+                                event.setNewQuantity(Long.parseLong(values[5]));
                                 break;
                             case TPEvent.EVENT_TYPE_BUY_ORDER_LISTING_QUANTITY_MODIFIED:
                             case TPEvent.EVENT_TYPE_SELL_ORDER_LISTING_QUANTITY_MODIFIED:
-                                // Item price ; Prev lising count ; New listing count
+                                // Item price ; Prev lising count ; New listing count ; Prev quantity ; New quantity
                                 event.setPreviousPrice(Double.parseDouble(values[0]));
                                 event.setPreviousListingCount(Long.parseLong(values[1]));
                                 event.setNewListingCount(Long.parseLong(values[2]));
+                                event.setPreviousQuantity(Long.parseLong(values[3]));
+                                event.setNewQuantity(Long.parseLong(values[4]));
                                 break;
                             case TPEvent.EVENT_TYPE_NEW_BUY_LISTING:
                             case TPEvent.EVENT_TYPE_NEW_SELL_LISTING:
-                                // Just the new price ; new listing count
+                                // Just the new price ; new listing count ; new quantity
                                 event.setNewPrice(Double.parseDouble(values[0]));
                                 event.setNewListingCount(Long.parseLong(values[1]));
+                                event.setNewQuantity(Long.parseLong(values[2]));
+                                break;
+                            case TPEvent.EVENT_TYPE_BUY_ORDER_GONE:
+                            case TPEvent.EVENT_TYPE_SELL_ORDER_GONE:
+                                // Just the prev price ; prev listing count ; prev quantity
+                                event.setPreviousPrice(Double.parseDouble(values[0]));
+                                event.setPreviousListingCount(Long.parseLong(values[1]));
+                                event.setPreviousQuantity(Long.parseLong(values[2]));
                                 break;
                             default:
                                 return null;
@@ -174,8 +196,36 @@ public class TPTransactionLog {
         return res;
     }
     
+    public void saveItemState() throws IOException, org.json.simple.parser.ParseException {
+        // This got written after the loadItemState() mathod.
+        // I'm trying to take advantage of the full JSON text that should be in the TPListings object.
+        // We cannot save if the item ID is bogus or if there is no TPListings object.
+        if (this.itemId > 0 && this.tpListings != null) {
+            JSONParser parser = new JSONParser();
+            Object obj = parser.parse(this.tpListings.getFullJSONData());
+            try {
+                JSONObject jsonObject = (JSONObject)obj;
+                if (this.name != null && !this.name.isEmpty()) {
+                    jsonObject.put("name", this.name);
+                }
+                // Check if directory exists:
+                TPTransactionLog.checkAndCreateTransactionLogDir();
+                // This is a "try with resources" thing, I don't know if it works.
+                try (FileWriter file = new FileWriter(TPTransactionLog.PATH_TRANSACTION_LOG.concat(File.pathSeparator).concat(Long.toString(this.getItemId())).concat(".json"))) {
+                    file.write(jsonObject.toJSONString());
+                    file.flush();
+                }
+            } catch (ClassCastException ex) {
+                // Don't ask me why I put 12 in that constructor.
+                throw new org.json.simple.parser.ParseException(12);
+            }
+        }
+    }
+    
     /**
      * Try to load the state for this transaction logging instance from the state file
+     * Also loads the name of the item if it's in there and has not been set on the current
+     * TPTransactionLog instance.
      * @throws java.io.IOException in case of file input errors
      * @throws org.json.simple.parser.ParseException in case of class casting error or general JSON parsing errors
      */
@@ -191,6 +241,10 @@ public class TPTransactionLog {
                 Object obj = parser.parse(new FileReader(file));
                 try {
                     JSONObject jsonObject = (JSONObject) obj;
+                    Object name = jsonObject.get("name");
+                    if (name != null) {
+                        this.name = (String)name;
+                    }
                     // We're looking for two lists: buys and sells.
                     // Both lists of maps.
                     JSONArray rdBuys = (JSONArray) jsonObject.get("buys");
@@ -223,11 +277,8 @@ public class TPTransactionLog {
             }
         }
     }
-   
-    public static void appendToLog(TPEvent event) throws IOException, SecurityException {
-        // If log file does not exist, try to create it.
-        // We'll have to throw a whole bunch of exceptions.
-        // Check for folder existence:
+    
+    public static void checkAndCreateTransactionLogDir() throws IOException {
         File folder = new File(TPTransactionLog.PATH_TRANSACTION_LOG);
         if (!folder.exists()) {
             // Create the folder:
@@ -236,6 +287,13 @@ public class TPTransactionLog {
             // That's a big problem, not deleting that file that's not a directory.
             throw new IOException("The log path " + TPTransactionLog.PATH_TRANSACTION_LOG + " exists but is not a directory. Cannot log data.");
         }
+    }
+   
+    public static void appendToLog(TPEvent event) throws IOException, SecurityException {
+        // If log file does not exist, try to create it.
+        // We'll have to throw a whole bunch of exceptions.
+        // Check for folder existence and create the directory if it doesn't exist:
+        TPTransactionLog.checkAndCreateTransactionLogDir();
         File file = new File(TPTransactionLog.PATH_TRANSACTION_LOG.concat(Long.toString(event.getId()).concat(TPTransactionLog.LOG_EXTENSION)));
         StandardOpenOption opt = null;
         if (file.exists()) {
@@ -251,21 +309,30 @@ public class TPTransactionLog {
             case TPEvent.EVENT_TYPE_HIGHEST_BUY_ORDER_CHANGED:
             case TPEvent.EVENT_TYPE_LOWEST_SELL_ORDER_CHANGED:
                 // Log new highest buy order, previous highest buy order + quantity for reach.
-                // Order: prev highest buy order ; prev quantity ; new highest buy order ; new quantity
+                // Order: prev highest buy order ; prev listings ; new highest buy order ; new listings ; prev quantity ; new quantity
                 line = line.concat(Double.toString(event.getNewPrice())).concat(TPTransactionLog.VALUES_SEPARATOR).concat(Long.toString(event.getNewListingCount()))
                         .concat(TPTransactionLog.VALUES_SEPARATOR).concat(Double.toString(event.getPreviousPrice())).concat(TPTransactionLog.VALUES_SEPARATOR)
-                        .concat(Long.toString(event.getPreviousListingCount()));
+                        .concat(Long.toString(event.getPreviousListingCount())).concat(TPTransactionLog.VALUES_SEPARATOR).concat(Long.toString(event.getPreviousQuantity()))
+                        .concat(TPTransactionLog.VALUES_SEPARATOR).concat(Long.toString(event.getQuantity()));
                 break;
             case TPEvent.EVENT_TYPE_BUY_ORDER_LISTING_QUANTITY_MODIFIED:
             case TPEvent.EVENT_TYPE_SELL_ORDER_LISTING_QUANTITY_MODIFIED:
-                // Item price ; Prev lising count ; New listing count
+                // Item price ; Prev lising count ; New listing count ; Prev quantity ; New quantity
                 line = line.concat(Double.toString(event.getPreviousPrice())).concat(TPTransactionLog.VALUES_SEPARATOR).concat(Long.toString(event.getPreviousListingCount()))
-                        .concat(TPTransactionLog.VALUES_SEPARATOR).concat(Long.toString(event.getNewListingCount()));
+                        .concat(TPTransactionLog.VALUES_SEPARATOR).concat(Long.toString(event.getNewListingCount())).concat(TPTransactionLog.VALUES_SEPARATOR)
+                        .concat(Long.toString(event.getPreviousQuantity())).concat(TPTransactionLog.VALUES_SEPARATOR).concat(Long.toString(event.getQuantity()));
                 break;
             case TPEvent.EVENT_TYPE_NEW_BUY_LISTING:
             case TPEvent.EVENT_TYPE_NEW_SELL_LISTING:
-                // Just the new price ; new listing count
-                line = line.concat(Double.toString(event.getNewPrice())).concat(TPTransactionLog.VALUES_SEPARATOR).concat(Long.toString(event.getNewListingCount()));
+                // Just the new price ; new listing count ; new quantity
+                line = line.concat(Double.toString(event.getNewPrice())).concat(TPTransactionLog.VALUES_SEPARATOR).concat(Long.toString(event.getNewListingCount()))
+                        .concat(TPTransactionLog.VALUES_SEPARATOR).concat(Long.toString(event.getQuantity()));
+                break;
+            case TPEvent.EVENT_TYPE_BUY_ORDER_GONE:
+            case TPEvent.EVENT_TYPE_SELL_ORDER_GONE:
+                // Just the prev price ; prev listing count ; prev quantity
+                line = line.concat(Double.toString(event.getPreviousPrice())).concat(TPTransactionLog.VALUES_SEPARATOR).concat(Long.toString(event.getPreviousListingCount()))
+                        .concat(TPTransactionLog.VALUES_SEPARATOR).concat(Long.toString(event.getPreviousQuantity()));
                 break;
             default:
                 line = line.concat("0");
@@ -342,6 +409,20 @@ public class TPTransactionLog {
      */
     public void setTpListings(TPListings tpListings) {
         this.tpListings = tpListings;
+    }
+
+    /**
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @param name the name to set
+     */
+    public void setName(String name) {
+        this.name = name;
     }
     
 }

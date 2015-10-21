@@ -158,6 +158,10 @@ public class TPEvent {
     public long getQuantity() {
         return quantity;
     }
+    
+    public long getNewQuantity() {
+        return this.getQuantity();
+    }
 
     /**
      * @param quantity the quantity to set

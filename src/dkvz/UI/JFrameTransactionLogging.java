@@ -43,7 +43,7 @@ public class JFrameTransactionLogging extends javax.swing.JFrame implements CanL
             if (fList != null) {
                 for (File file : fList) {
                     // The file needs to be a JSON file:
-                    if (file.getName().toLowerCase().endsWith(".json")) {
+                    if (file.getName().toLowerCase().endsWith(TPTransactionLog.STATE_EXTENSION)) {
                         try {
                             // Read the item name and ID from the file.
                             // If the ID isn't there, ignore that file.

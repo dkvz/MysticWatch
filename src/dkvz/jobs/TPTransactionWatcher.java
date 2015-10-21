@@ -68,9 +68,13 @@ public class TPTransactionWatcher extends Observable implements Runnable, CanLog
                 // Save the new listing as the current listing.
                 tpLog.setTpListings(newState);
                 // Save the state.
-                // I should remember that I saved the JSON text in the TPListings object, normally. Also
-                // I should add the name of the item in there.
-                // Shit that's getting complicated.
+                try {
+                    tpLog.saveItemState();
+                } catch (IOException ex) {
+                    this.logMessage("ERROR - Could not save the item state for Item " + tpLog.getItemId() + " - Input Output Exception");
+                } catch (org.json.simple.parser.ParseException ex) {
+                    this.logMessage("ERROR - Could not save the item state for Item " + tpLog.getItemId() + " - The saved data for this item is corrupted");
+                }
                 
             } catch (IOException ex) {
                 this.logMessage("ERROR - IO Exception while looking for listings for item " + tpLog.getItemId());
@@ -85,6 +89,8 @@ public class TPTransactionWatcher extends Observable implements Runnable, CanLog
     public void logMessage(String msg) {
         if (this.logger != null) {
             this.logger.logMessage(msg);
+        } else {
+            System.out.println(msg);
         }
     }
     
