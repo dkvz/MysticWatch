@@ -198,7 +198,7 @@
                               <Component id="jTextFieldFixedPriceItemPrice" max="32767" attributes="0"/>
                               <Component id="jLabelFixedPriceItemPrice" pref="59" max="32767" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="10" max="32767" attributes="0"/>
+                          <EmptySpace max="32767" attributes="0"/>
                           <Component id="jButtonFixedItemPriceAdd" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="jButtonFixedPriceItemRemove" min="-2" max="-2" attributes="0"/>
@@ -223,7 +223,7 @@
                               <Component id="jButtonFixedItemPriceAdd" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="jButtonFixedPriceItemRemove" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="63" max="32767" attributes="0"/>
+                          <EmptySpace max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>

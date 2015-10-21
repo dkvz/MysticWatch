@@ -3,7 +3,7 @@ package dkvz.UI;
 
 /**
  * Since I already have a lot of files let's go crazy.
- * @author Alain
+ * @author William
  */
 public interface CanLogMessages {
     

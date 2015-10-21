@@ -5,8 +5,6 @@ import dkvz.UI.*;
 import java.util.*;
 import dkvz.model.*;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.json.simple.parser.ParseException;
 
 /**
@@ -43,30 +41,43 @@ public class TPTransactionWatcher extends Observable implements Runnable, CanLog
             // can easily display the progress on progress bars).
             if (!tpLog.isLoaded()) {
                 try {
-                    this.logMessage("Transaction log " + tpLog.getItemId() + " has to be loaded...");
-                    tpLog.readTransactionLog();
-                    this.logMessage("Transaction log loaded.");
+                    this.logMessage("TP listings for " + tpLog.getItemId() + " have to be loaded...");
+                    tpLog.loadItemState();
+                    this.logMessage("TP listings loaded.");
                 } catch (Exception ex) {
-                    this.logMessage("ERROR - Transaction log for item " + tpLog.getItemId() + " could not be loaded.");
+                    this.logMessage("ERROR - TP listings for item " + tpLog.getItemId() + " could not be loaded.");
                     this.logMessage("Removing the item from the watch list.");
                     this.removeItemToWatch(tpLog.getItemId());
                 }
             }
             try {
                 // Load the updated state from the API:
+                this.logMessage("Getting updated listings for item " + tpLog.getItemId() + "...");
                 TPListings newState = GW2APIHelper.getTPListings(tpLog.getItemId());
                 // We're supposed to compare with the older state to create events... Right?
                 // There should be a comparison method in TPListings.
                 List<TPEvent> tpEvents = tpLog.getTpListings().getTPEventsUpToListing(newState);
+                // Save the new listing as the current listing.
+                tpLog.setTpListings(newState);
                 if (!tpEvents.isEmpty()) {
                     // We got some stuff that happened.
                     // TODO We should write to the actual file, and also notify the observers of events that may be interresting for
                     // those.
-                    
+                    try {
+                        // Writing to the log:
+                        TPTransactionLog.appendEventListToLog(tpEvents, tpLog.getItemId());
+                    } catch (IOException ex) {
+                        this.logMessage("ERROR - Could not write transaction log file for " + tpLog.getItemId() + " - Input Output Exception");
+                    } catch (SecurityException ex) {
+                        this.logMessage("ERROR - Could not write transaction log file for " + tpLog.getItemId() + " - Security Exception - Check permissions");
+                    }
+                    // Notify observers. We need to pass on a list of events, it's going to be set to the tpLog object,
+                    // so it won't have all the events, just the latest detected.
+                    tpLog.getEventListRead().addAll(tpEvents);
+                    this.setChanged();
+                    this.notifyObservers(tpLog);
                 }
                 
-                // Save the new listing as the current listing.
-                tpLog.setTpListings(newState);
                 // Save the state.
                 try {
                     tpLog.saveItemState();
@@ -79,7 +90,7 @@ public class TPTransactionWatcher extends Observable implements Runnable, CanLog
             } catch (IOException ex) {
                 this.logMessage("ERROR - IO Exception while looking for listings for item " + tpLog.getItemId());
             } catch (ParseException ex) {
-                Logger.getLogger("ERROR parsing the JSON in the response from the API for item " + tpLog.getItemId());
+                this.logMessage("ERROR parsing the JSON in the response from the API for item " + tpLog.getItemId());
             }
         }
         this.logMessage("TP Transaction Watching thread closing...");
@@ -114,6 +125,20 @@ public class TPTransactionWatcher extends Observable implements Runnable, CanLog
         // Let's do it this way so I haven't written equals for nothing:
         TPTransactionLog lookForMe = new TPTransactionLog(itemId);
         this.transactionLogs.remove(lookForMe);
+    }
+    
+    public synchronized boolean isEmpty() {
+        return this.transactionLogs.isEmpty();
+    }
+    
+    public synchronized boolean contains(Item item) {
+        return this.contains(item.getId());
+    }
+    
+    public synchronized boolean contains(long itemId) {
+        // Again using awkward equals antics:
+        TPTransactionLog lookForMe = new TPTransactionLog(itemId);
+        return this.transactionLogs.contains(lookForMe);
     }
 
     /**

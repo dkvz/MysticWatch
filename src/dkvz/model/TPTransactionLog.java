@@ -288,19 +288,26 @@ public class TPTransactionLog {
             throw new IOException("The log path " + TPTransactionLog.PATH_TRANSACTION_LOG + " exists but is not a directory. Cannot log data.");
         }
     }
-   
-    public static void appendToLog(TPEvent event) throws IOException, SecurityException {
+    
+    public static void appendEventListToLog(List<TPEvent> events, long itemId) throws IOException, SecurityException {
         // If log file does not exist, try to create it.
         // We'll have to throw a whole bunch of exceptions.
         // Check for folder existence and create the directory if it doesn't exist:
         TPTransactionLog.checkAndCreateTransactionLogDir();
-        File file = new File(TPTransactionLog.PATH_TRANSACTION_LOG.concat(Long.toString(event.getId()).concat(TPTransactionLog.LOG_EXTENSION)));
+        File file = new File(TPTransactionLog.PATH_TRANSACTION_LOG.concat(Long.toString(itemId).concat(TPTransactionLog.LOG_EXTENSION)));
         StandardOpenOption opt = null;
         if (file.exists()) {
             opt = StandardOpenOption.APPEND;
         } else {
             opt = StandardOpenOption.CREATE_NEW;
         }
+        for (TPEvent event : events) {
+            String line = TPTransactionLog.generateLogLine(event);
+            Files.write(Paths.get(file.getPath()), line.getBytes(), opt);
+        }
+    }
+    
+    private static String generateLogLine(TPEvent event) {
         SimpleDateFormat format = new SimpleDateFormat("dd:MM:yyyy HH:mm:ss");
 	String dateToStr = format.format(new Date());
         String line = dateToStr.concat(TPTransactionLog.SEPARATOR).concat(Integer.toString(event.getEventType()));
@@ -337,7 +344,22 @@ public class TPTransactionLog {
             default:
                 line = line.concat("0");
         }
-        line = line.concat("\n");
+        return line.concat("\n");
+    }
+   
+    public static void appendToLog(TPEvent event) throws IOException, SecurityException {
+        // If log file does not exist, try to create it.
+        // We'll have to throw a whole bunch of exceptions.
+        // Check for folder existence and create the directory if it doesn't exist:
+        TPTransactionLog.checkAndCreateTransactionLogDir();
+        File file = new File(TPTransactionLog.PATH_TRANSACTION_LOG.concat(Long.toString(event.getId()).concat(TPTransactionLog.LOG_EXTENSION)));
+        StandardOpenOption opt = null;
+        if (file.exists()) {
+            opt = StandardOpenOption.APPEND;
+        } else {
+            opt = StandardOpenOption.CREATE_NEW;
+        }
+        String line = TPTransactionLog.generateLogLine(event);
         Files.write(Paths.get(file.getPath()), line.getBytes(), opt);
     }
 

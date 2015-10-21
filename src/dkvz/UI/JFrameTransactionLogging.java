@@ -2,6 +2,7 @@
 package dkvz.UI;
 
 import dkvz.model.*;
+import dkvz.jobs.*;
 import java.awt.Cursor;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -12,12 +13,14 @@ import org.json.simple.parser.ParseException;
 
 /**
  *
- * @author Alain
+ * @author William
  */
-public class JFrameTransactionLogging extends javax.swing.JFrame implements CanLogMessages {
+public class JFrameTransactionLogging extends javax.swing.JFrame implements CanLogMessages, Observer {
 
     private JFrameMain mainFrame = null;
     private List<Item> comboList = null;
+    private TPTransactionLog currentlyDisplayed = null;
+    private TPTransactionWatcher watchThread = null;
     
     /**
      * Creates new form JFrameTransactionLogging
@@ -25,11 +28,22 @@ public class JFrameTransactionLogging extends javax.swing.JFrame implements CanL
     public JFrameTransactionLogging(JFrameMain mainFrame) {
         initComponents();
         this.mainFrame = mainFrame;
+        this.watchThread = new TPTransactionWatcher();
         // Build the list of transaction logs:
+        this.jButtonStartStopLogging.setEnabled(false);
         this.buildComboFromFiles();
     }
     
-    public void buildComboFromFiles() {
+    public JFrameTransactionLogging(JFrameMain mainFrame, TPTransactionWatcher watchThread) {
+        initComponents();
+        this.mainFrame = mainFrame;
+        this.watchThread = watchThread;
+        // Build the list of transaction logs:
+        this.jButtonStartStopLogging.setEnabled(false);
+        this.buildComboFromFiles();
+    }
+    
+    public final void buildComboFromFiles() {
         // Looks for .json item transaction state files in the log directory.
         // This is going to need a whole bunch of try catching.
         this.comboList = new ArrayList<Item>();
@@ -59,8 +73,7 @@ public class JFrameTransactionLogging extends javax.swing.JFrame implements CanL
                 }
             }
         } else {
-            // We have a big problem: transaction log dir either doesn't exist
-            // or isn't a directory.
+            // We have a big problem: transaction log dir either doesn't exist or isn't a directory.
             JOptionPane.showMessageDialog(null, "The transaction log directory (" + TPTransactionLog.PATH_TRANSACTION_LOG + 
                     ") is NOT a directory or the directory creation failed.\nYou'll have to manually"
                     + " create the directory.", "Error saving file", JOptionPane.ERROR_MESSAGE);
@@ -101,6 +114,10 @@ public class JFrameTransactionLogging extends javax.swing.JFrame implements CanL
         jScrollPanelLog = new javax.swing.JScrollPane();
         jTextAreaLog = new javax.swing.JTextArea();
         jProgressBarLog = new javax.swing.JProgressBar();
+        jMenuBarTop = new javax.swing.JMenuBar();
+        jMenuTools = new javax.swing.JMenu();
+        jMenuItemManuallyAddItem = new javax.swing.JMenuItem();
+        jMenuItemSort = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Transaction Logging");
@@ -121,12 +138,27 @@ public class JFrameTransactionLogging extends javax.swing.JFrame implements CanL
         jPanelTop.add(jComboBoxTransactionFile);
 
         jButtonStartStopLogging.setText("Start Logging");
+        jButtonStartStopLogging.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonStartStopLoggingActionPerformed(evt);
+            }
+        });
         jPanelTop.add(jButtonStartStopLogging);
 
         jButtonStopAllLogging.setText("Stop All Logging");
+        jButtonStopAllLogging.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonStopAllLoggingActionPerformed(evt);
+            }
+        });
         jPanelTop.add(jButtonStopAllLogging);
 
         jButtonDeleteLog.setText("Delete Log");
+        jButtonDeleteLog.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonDeleteLogActionPerformed(evt);
+            }
+        });
         jPanelTop.add(jButtonDeleteLog);
 
         jButtonClose.setText("Close");
@@ -161,6 +193,30 @@ public class JFrameTransactionLogging extends javax.swing.JFrame implements CanL
 
         getContentPane().add(jSplitPaneCenter, java.awt.BorderLayout.CENTER);
 
+        jMenuTools.setMnemonic('T');
+        jMenuTools.setText("Tools");
+
+        jMenuItemManuallyAddItem.setMnemonic('M');
+        jMenuItemManuallyAddItem.setText("Manually add item...");
+        jMenuItemManuallyAddItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemManuallyAddItemActionPerformed(evt);
+            }
+        });
+        jMenuTools.add(jMenuItemManuallyAddItem);
+
+        jMenuItemSort.setText("Sort the log list");
+        jMenuItemSort.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemSortActionPerformed(evt);
+            }
+        });
+        jMenuTools.add(jMenuItemSort);
+
+        jMenuBarTop.add(jMenuTools);
+
+        setJMenuBar(jMenuBarTop);
+
         setSize(new java.awt.Dimension(775, 622));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
@@ -178,6 +234,7 @@ public class JFrameTransactionLogging extends javax.swing.JFrame implements CanL
         if (this.jComboBoxTransactionFile.getSelectedItem() != null) {
             Cursor initCursor = this.getCursor();
             try {
+                this.jButtonStartStopLogging.setEnabled(false);
                 this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                 Item item = (Item)this.jComboBoxTransactionFile.getSelectedItem();
                 // Load the events table:
@@ -193,21 +250,147 @@ public class JFrameTransactionLogging extends javax.swing.JFrame implements CanL
                 // The file is loaded.
                 // Let's create the data model for the table:
                 TPLogTableDataModel dataModel = new TPLogTableDataModel(tLog);
+                this.currentlyDisplayed = tLog;
                 this.jTableTransactionLog.setModel(dataModel);
                 this.jProgressBarLog.setValue(110);
+                this.jButtonStartStopLogging.setEnabled(true);
+                if (this.isLoggingStartedForItem(item.getId())) {
+                    // Start logging becomes stop logging here.
+                    this.toggleStopLogging();
+                } else {
+                    this.toggleStartLogging();
+                }
             } finally {
-                this.setCursor(initCursor);
+                if (initCursor != null) {
+                    this.setCursor(initCursor);
+                } else {
+                    this.setCursor(Cursor.getDefaultCursor());
+                }
             }
         }
     }//GEN-LAST:event_jComboBoxTransactionFileActionPerformed
 
+    private void toggleStopLogging() {
+        // Set text to stop logging.
+        this.jButtonStartStopLogging.setText("Stop Logging");
+        this.jButtonStartStopLogging.setEnabled(true);
+    }
+    
+    private void toggleStartLogging() {
+        // Set text to stop logging.
+        this.jButtonStartStopLogging.setText("Start Logging");
+        this.jButtonStartStopLogging.setEnabled(true);
+    }
+    
+    private boolean isLoggingStartedForItem(long itemId) {
+        if (!this.watchThread.isEmpty()) {
+            if (this.getWatchThread().contains(itemId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    private void jMenuItemManuallyAddItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemManuallyAddItemActionPerformed
+        // I'm going to do this with a dialog box:
+        String strItemID = JOptionPane.showInputDialog(this, "Enter the item ID:", "Enter item ID", JOptionPane.INFORMATION_MESSAGE);
+        if (strItemID != null && !strItemID.isEmpty()) {
+            try {
+                long itemId = Long.parseLong(strItemID);
+                Item item = new Item();
+                item.setId(itemId);
+                // Let's get the name.
+                Cursor initCursor = this.getCursor();
+                try {
+                    this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                    String name = GW2APIHelper.getItemName(itemId);
+                    item.setName(name);
+                } catch (Exception ex) {
+                    this.logMessage("Could not get the name of item ".concat(Long.toString(itemId)));
+                } finally {
+                    if (initCursor != null) {
+                        this.setCursor(initCursor);
+                    } else {
+                        this.setCursor(Cursor.getDefaultCursor());
+                    }
+                }
+                this.comboList.add(item);
+                this.jComboBoxTransactionFile.addItem(item);
+                // We should set this item as the active log:
+                this.jComboBoxTransactionFile.setSelectedItem(item);
+                // I need to check if this fires ActionPerformed.
+                // Yes it does.
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "Could not add item, invalid item ID.", "Error adding item", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }//GEN-LAST:event_jMenuItemManuallyAddItemActionPerformed
 
+    private void jButtonStartStopLoggingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonStartStopLoggingActionPerformed
+        // This frame is actually responsible for adding the events logging started and logging stopped.
+        
+    }//GEN-LAST:event_jButtonStartStopLoggingActionPerformed
+
+    private void jButtonStopAllLoggingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonStopAllLoggingActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButtonStopAllLoggingActionPerformed
+
+    private void jButtonDeleteLogActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDeleteLogActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButtonDeleteLogActionPerformed
+
+    private void jMenuItemSortActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemSortActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jMenuItemSortActionPerformed
+
+    @Override
+    public void update(Observable o, Object tranLog) {
+        // The thread that's updating listings can send update events to this frame. It's 
+        // supposed to provide a TPTransactionLog object with a limited list of events
+        // that are the new events only. If that item is the one currently displayed on the
+        // form, we can update the data model and show the changes.
+        if (tranLog instanceof TPTransactionLog) {
+            if (this.currentlyDisplayed != null) {
+                TPTransactionLog tpLog = (TPTransactionLog)tranLog;
+                if (this.currentlyDisplayed.equals(tpLog)) {
+                    this.currentlyDisplayed.getEventListRead().addAll(tpLog.getEventListRead());
+                    // Fire a model update event for the datatable:
+                    TPLogTableDataModel model = (TPLogTableDataModel) this.jTableTransactionLog.getModel();
+                    model.fireTableDataChanged();
+                    // We should also scroll to the bottom, I don't know how to do that.
+                    // Let's try this:
+                    JScrollBar vertical = this.jScrollPaneTable.getVerticalScrollBar();
+                    vertical.setValue(vertical.getMaximum());
+                    // I don't know if I need to repaint the frame. Trying without.
+                }
+            }
+        }
+    }
+
+    /**
+     * @return the currentlyDisplayed
+     */
+    public TPTransactionLog getCurrentlyDisplayed() {
+        return currentlyDisplayed;
+    }
+    
+    /**
+     * @return the watchThread
+     */
+    public TPTransactionWatcher getWatchThread() {
+        return watchThread;
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonClose;
     private javax.swing.JButton jButtonDeleteLog;
     private javax.swing.JButton jButtonStartStopLogging;
     private javax.swing.JButton jButtonStopAllLogging;
     private javax.swing.JComboBox jComboBoxTransactionFile;
+    private javax.swing.JMenuBar jMenuBarTop;
+    private javax.swing.JMenuItem jMenuItemManuallyAddItem;
+    private javax.swing.JMenuItem jMenuItemSort;
+    private javax.swing.JMenu jMenuTools;
     private javax.swing.JPanel jPanelBottom;
     private javax.swing.JPanel jPanelTop;
     private javax.swing.JProgressBar jProgressBarLog;
@@ -217,4 +400,12 @@ public class JFrameTransactionLogging extends javax.swing.JFrame implements CanL
     private javax.swing.JTable jTableTransactionLog;
     private javax.swing.JTextArea jTextAreaLog;
     // End of variables declaration//GEN-END:variables
+
+    /**
+     * @param watchThread the watchThread to set
+     */
+    public void setWatchThread(TPTransactionWatcher watchThread) {
+        this.watchThread = watchThread;
+    }
+
 }

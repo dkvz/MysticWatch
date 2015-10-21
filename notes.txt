@@ -16,3 +16,4 @@ Namespace is import org.json.simple.*;
   * I think quantity is absent from the transaction log display. There are listings but those are independant from the total quantity of items.
   * I forgot about two types of TPEvents about listings that are gone. I don't know if that has consequences for the UI too.
   * I don't think I've put the TPEvent logging started (and ended) anywhere, that should be a thing.
+  * The main frame may create a transaction logging thread, and then pass it in the constructor of the transaction logging frame, if it exists.
