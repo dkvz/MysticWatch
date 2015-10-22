@@ -20,7 +20,10 @@ public class JFrameTransactionLogging extends javax.swing.JFrame implements CanL
     private JFrameMain mainFrame = null;
     private List<Item> comboList = null;
     private TPTransactionLog currentlyDisplayed = null;
+    // I should stop calling those threads, they have nothing to do with the Thread class.
     private TPTransactionWatcher watchThread = null;
+    
+    // Some methods in here are expecting watchThread to never be null!
     
     /**
      * Creates new form JFrameTransactionLogging
@@ -325,22 +328,106 @@ public class JFrameTransactionLogging extends javax.swing.JFrame implements CanL
             }
         }
     }//GEN-LAST:event_jMenuItemManuallyAddItemActionPerformed
-
+    
     private void jButtonStartStopLoggingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonStartStopLoggingActionPerformed
         // This frame is actually responsible for adding the events logging started and logging stopped.
-        
+        // I mean mainFrame can be responsible of that too but this button press may have to log those events.
+        if (this.currentlyDisplayed != null) {
+            if (this.isLoggingStartedForItem(this.currentlyDisplayed.getItemId())) {
+                this.jButtonStartStopLogging.setEnabled(false);
+                // We need to stop the logging for this item.
+                this.watchThread.removeItemToWatch(this.currentlyDisplayed.getItemId());
+                // Add the logging stopped event:
+                TPEvent event = new TPEvent(this.currentlyDisplayed.getItemId(), TPEvent.EVENT_TYPE_LOGGING_STOPPED);
+                this.currentlyDisplayed.getEventListRead().add(event);
+                // Refresh the datatable:
+                this.refreshDataTable();
+                try {
+                    TPTransactionLog.appendToLog(event);
+                } catch (IOException ex) {
+                    this.logMessage("ERROR writing the logging stopped event for " + this.currentlyDisplayed.getItemId() + " - IO Exception");
+                } catch (SecurityException ex) {
+                    this.logMessage("ERROR writing the logging stopped event for " + this.currentlyDisplayed.getItemId() + " - Security exception, check file permissions");
+                }
+                this.toggleStartLogging();
+            } else {
+                this.jButtonStartStopLogging.setEnabled(false);
+                // Start the logging for this item.
+                this.watchThread.addItemToWatch(this.currentlyDisplayed.getItemId());
+                // This may have to actually start the thread itself.
+                if (this.watchThread.isAbort()) {
+                    // Start the thread:
+                    this.watchThread.startWatcherThread();
+                }
+                // Add the logging started event:
+                TPEvent event = new TPEvent(this.currentlyDisplayed.getItemId(), TPEvent.EVENT_TYPE_LOGGING_STARTED);
+                this.currentlyDisplayed.getEventListRead().add(event);
+                // Refresh the datatable:
+                this.refreshDataTable();
+                try {
+                    TPTransactionLog.appendToLog(event);
+                } catch (IOException ex) {
+                    this.logMessage("ERROR writing the logging started event for " + this.currentlyDisplayed.getItemId() + " - IO Exception");
+                } catch (SecurityException ex) {
+                    this.logMessage("ERROR writing the logging started event for " + this.currentlyDisplayed.getItemId() + " - Security exception, check file permissions");
+                }
+                this.toggleStopLogging();
+            }
+        }
     }//GEN-LAST:event_jButtonStartStopLoggingActionPerformed
 
     private void jButtonStopAllLoggingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonStopAllLoggingActionPerformed
-        // TODO add your handling code here:
+        this.watchThread.removeAllItemsToWatch();
+        // This will also set the abort boolean to true and effectively end the thread eventually.
+        this.toggleStartLogging();
     }//GEN-LAST:event_jButtonStopAllLoggingActionPerformed
 
     private void jButtonDeleteLogActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDeleteLogActionPerformed
-        // TODO add your handling code here:
+        if (this.currentlyDisplayed != null) {
+            // We could probably do with a "Are you sure?" thing:
+            int dialogResult = JOptionPane.showConfirmDialog (null, "Are you sure? This will delete the related files.", "Delete TP transactions log", JOptionPane.YES_NO_OPTION);
+            if (dialogResult == JOptionPane.YES_OPTION) {
+                Cursor initCursor = this.getCursor();
+                try {
+                    this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                    // We need to remove it from the thread first. We should maybe wait the request interval duration to make sure
+                    // we're not writing more to that log in the meantime but whatever.
+                    this.watchThread.removeItemToWatch(this.currentlyDisplayed.getItemId());
+                    // Remove the files:
+                    String base = TPTransactionLog.PATH_TRANSACTION_LOG.concat(File.pathSeparator).concat(Long.toString(this.currentlyDisplayed.getItemId()));
+                    File state = new File(base.concat(TPTransactionLog.STATE_EXTENSION));
+                    File log = new File(base.concat(TPTransactionLog.LOG_EXTENSION));                
+                    if (state.exists()) {
+                        boolean success = state.delete();
+                        if (success) {
+                            this.logMessage("Deleted state file for item " + this.currentlyDisplayed.getItemId());
+                        } else {
+                            this.logMessage("ERROR - Could not delete state file for item " + this.currentlyDisplayed.getItemId());
+                        }
+                    }
+                    if (log.exists()) {
+                        boolean success = log.delete();
+                        if (success) {
+                            this.logMessage("Deleted transactions log file for item " + this.currentlyDisplayed.getItemId());
+                        } else {
+                            this.logMessage("ERROR - Could not delete transactions log file for item " + this.currentlyDisplayed.getItemId());
+                        }
+                    }
+                    // Update the combo and the list:
+                    this.buildComboFromFiles();
+                    this.currentlyDisplayed = null;
+                    // TODO: what happens if this was the selected event? I may have to clean the datatable.
+
+                } finally {
+                    this.setCursor(initCursor);
+                }
+            }
+        }
     }//GEN-LAST:event_jButtonDeleteLogActionPerformed
 
     private void jMenuItemSortActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemSortActionPerformed
-        // TODO add your handling code here:
+        // TODO I think I may have to implement comparable or something like that for this.
+        
     }//GEN-LAST:event_jMenuItemSortActionPerformed
 
     @Override
@@ -355,16 +442,20 @@ public class JFrameTransactionLogging extends javax.swing.JFrame implements CanL
                 if (this.currentlyDisplayed.equals(tpLog)) {
                     this.currentlyDisplayed.getEventListRead().addAll(tpLog.getEventListRead());
                     // Fire a model update event for the datatable:
-                    TPLogTableDataModel model = (TPLogTableDataModel) this.jTableTransactionLog.getModel();
-                    model.fireTableDataChanged();
-                    // We should also scroll to the bottom, I don't know how to do that.
-                    // Let's try this:
-                    JScrollBar vertical = this.jScrollPaneTable.getVerticalScrollBar();
-                    vertical.setValue(vertical.getMaximum());
-                    // I don't know if I need to repaint the frame. Trying without.
+                    this.refreshDataTable();
                 }
             }
         }
+    }
+    
+    public void refreshDataTable() {
+        TPLogTableDataModel model = (TPLogTableDataModel) this.jTableTransactionLog.getModel();
+        model.fireTableDataChanged();
+        // We should also scroll to the bottom, I don't know how to do that.
+        // Let's try this:
+        JScrollBar vertical = this.jScrollPaneTable.getVerticalScrollBar();
+        vertical.setValue(vertical.getMaximum());
+        // I don't know if I need to repaint the frame. Trying without.
     }
 
     /**
@@ -379,6 +470,13 @@ public class JFrameTransactionLogging extends javax.swing.JFrame implements CanL
      */
     public TPTransactionWatcher getWatchThread() {
         return watchThread;
+    }
+    
+    /**
+     * @param watchThread the watchThread to set
+     */
+    public void setWatchThread(TPTransactionWatcher watchThread) {
+        this.watchThread = watchThread;
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -401,11 +499,5 @@ public class JFrameTransactionLogging extends javax.swing.JFrame implements CanL
     private javax.swing.JTextArea jTextAreaLog;
     // End of variables declaration//GEN-END:variables
 
-    /**
-     * @param watchThread the watchThread to set
-     */
-    public void setWatchThread(TPTransactionWatcher watchThread) {
-        this.watchThread = watchThread;
-    }
 
 }

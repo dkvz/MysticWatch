@@ -241,11 +241,17 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="Start for Selected"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonTrnLoggingStartSelectedActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="jButtonTrnLoggingStartAll">
           <Properties>
             <Property name="text" type="java.lang.String" value="Start for All"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonTrnLoggingStartAllActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="jButtonShowTrnLoggingFrame">
           <Properties>

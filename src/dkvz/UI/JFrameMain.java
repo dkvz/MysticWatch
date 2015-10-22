@@ -215,9 +215,19 @@ public class JFrameMain extends javax.swing.JFrame implements CanLogMessages {
         jPanelTop.add(jLabelTrnLogging);
 
         jButtonTrnLoggingStartSelected.setText("Start for Selected");
+        jButtonTrnLoggingStartSelected.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonTrnLoggingStartSelectedActionPerformed(evt);
+            }
+        });
         jPanelTop.add(jButtonTrnLoggingStartSelected);
 
         jButtonTrnLoggingStartAll.setText("Start for All");
+        jButtonTrnLoggingStartAll.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonTrnLoggingStartAllActionPerformed(evt);
+            }
+        });
         jPanelTop.add(jButtonTrnLoggingStartAll);
 
         jButtonShowTrnLoggingFrame.setText("Show Log Window");
@@ -408,7 +418,14 @@ public class JFrameMain extends javax.swing.JFrame implements CanLogMessages {
         }
     }//GEN-LAST:event_jButtonShowTrnLoggingFrameActionPerformed
 
-    
+    private void jButtonTrnLoggingStartSelectedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonTrnLoggingStartSelectedActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButtonTrnLoggingStartSelectedActionPerformed
+
+    private void jButtonTrnLoggingStartAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonTrnLoggingStartAllActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButtonTrnLoggingStartAllActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonAdd;
