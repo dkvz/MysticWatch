@@ -51,6 +51,7 @@ public class JFrameTransactionLogging extends javax.swing.JFrame implements CanL
         // Looks for .json item transaction state files in the log directory.
         // This is going to need a whole bunch of try catching.
         this.comboList = new ArrayList<Item>();
+        this.jComboBoxTransactionFile.removeAllItems();
         File logDir = new File(TPTransactionLog.PATH_TRANSACTION_LOG);
         if (!logDir.exists()) {
             // Attempt to create the directory.
@@ -236,6 +237,7 @@ public class JFrameTransactionLogging extends javax.swing.JFrame implements CanL
     private void jComboBoxTransactionFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxTransactionFileActionPerformed
         // We need to load up the model for the table.
         if (this.jComboBoxTransactionFile.getSelectedItem() != null) {
+            this.logMessage("Loading TP transaction log...");
             Cursor initCursor = this.getCursor();
             try {
                 this.jButtonStartStopLogging.setEnabled(false);
@@ -395,7 +397,7 @@ public class JFrameTransactionLogging extends javax.swing.JFrame implements CanL
                     // we're not writing more to that log in the meantime but whatever.
                     this.watchThread.removeItemToWatch(this.currentlyDisplayed.getItemId());
                     // Remove the files:
-                    String base = TPTransactionLog.PATH_TRANSACTION_LOG.concat(File.pathSeparator).concat(Long.toString(this.currentlyDisplayed.getItemId()));
+                    String base = TPTransactionLog.PATH_TRANSACTION_LOG.concat(File.separator).concat(Long.toString(this.currentlyDisplayed.getItemId()));
                     File state = new File(base.concat(TPTransactionLog.STATE_EXTENSION));
                     File log = new File(base.concat(TPTransactionLog.LOG_EXTENSION));                
                     if (state.exists()) {

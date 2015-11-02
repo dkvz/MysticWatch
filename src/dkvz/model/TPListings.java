@@ -61,8 +61,11 @@ public class TPListings {
             if (count == 0) {
                 // We have special events for the first entries.
                 // Here I just need to know if it was the first entry before.
-                Map.Entry<Long, Long[]> firstEntryBefore = previousListing.entrySet().iterator().next();
-                if (!firstEntryBefore.getKey().equals(entry.getKey())) {
+                Map.Entry<Long, Long[]> firstEntryBefore = null;
+                if (previousListing.entrySet().iterator().hasNext()) {
+                    firstEntryBefore = previousListing.entrySet().iterator().next();
+                }
+                if (firstEntryBefore == null || !firstEntryBefore.getKey().equals(entry.getKey())) {
                     // This wasn't the first entry before, so it's a new top listing.
                     // It may be a new listing too but that will be checked later on in this loop.
                     TPEvent event = null;
@@ -71,7 +74,11 @@ public class TPListings {
                     } else {
                         event = new TPEvent(this.getItemId(), TPEvent.EVENT_TYPE_LOWEST_SELL_ORDER_CHANGED);
                     }
-                    event.setValuesFromListingEntries(firstEntryBefore.getKey(), firstEntryBefore.getValue(), entry.getKey(), entry.getValue());
+                    if (firstEntryBefore != null) {
+                        event.setValuesFromListingEntries(firstEntryBefore.getKey(), firstEntryBefore.getValue(), entry.getKey(), entry.getValue());
+                    } else {
+                        event.setValuesFromListingEntries(0l, TPListings.makeZeroesValueArray(), entry.getKey(), entry.getValue());
+                    }
                     ret.add(event);
                 }
             }

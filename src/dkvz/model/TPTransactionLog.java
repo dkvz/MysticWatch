@@ -6,6 +6,7 @@ import java.nio.file.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Pattern;
 import org.json.simple.*;
 import org.json.simple.parser.*;
 
@@ -63,7 +64,7 @@ public class TPTransactionLog {
         this.eventListRead = new ArrayList<TPEvent>();
         this.progress = 0;
         if (this.itemId > 0) {
-            File file = new File(TPTransactionLog.PATH_TRANSACTION_LOG.concat(File.pathSeparator).concat(Long.toString(this.getItemId()).concat(TPTransactionLog.LOG_EXTENSION)));
+            File file = new File(TPTransactionLog.PATH_TRANSACTION_LOG.concat(File.separator).concat(Long.toString(this.getItemId()).concat(TPTransactionLog.LOG_EXTENSION)));
             if (file.exists()) {
                 try {
                     FileInputStream fstream = new FileInputStream(file);
@@ -77,7 +78,6 @@ public class TPTransactionLog {
 
                         //Read File Line By Line
                         while ((strLine = br.readLine()) != null)   {
-                            // Interpret the line:
                             TPEvent event = TPTransactionLog.logLineToEvent(strLine, itemId);
                             if (event != null) {
                                 this.eventListRead.add(event);
@@ -104,7 +104,7 @@ public class TPTransactionLog {
     private static TPEvent logLineToEvent(String line, long itemId) {
         TPEvent event = null;
         if (line != null && !line.isEmpty()) {
-            String [] l = line.split(TPTransactionLog.SEPARATOR);
+            String [] l = line.split(Pattern.quote(TPTransactionLog.SEPARATOR));
             if (l.length == 3) {
                 // Date ; Event Type ; Values
                 try {
@@ -112,7 +112,7 @@ public class TPTransactionLog {
                     Date date = format.parse(l[0]);
                     int eventType = Integer.parseInt(l[1]);
                     // Now parse the values, depends on the eventType:
-                    String [] values = l[2].split(TPTransactionLog.VALUES_SEPARATOR);
+                    String [] values = l[2].split(Pattern.quote(TPTransactionLog.VALUES_SEPARATOR));
                     if (values != null) {
                         event = new TPEvent(itemId, eventType);
                         event.setDate(date);
@@ -159,6 +159,7 @@ public class TPTransactionLog {
                     }
                 } catch (ParseException | NumberFormatException | ArrayIndexOutOfBoundsException ex) {
                     // Returning null.
+                    ex.printStackTrace();
                     return null;
                 }
             }
@@ -186,6 +187,7 @@ public class TPTransactionLog {
                 throw new org.json.simple.parser.ParseException(20);
             } else {
                 if (name == null) name = "";
+                res = new Item();
                 res.setId(id);
                 res.setName(name);
             }
@@ -211,7 +213,7 @@ public class TPTransactionLog {
                 // Check if directory exists:
                 TPTransactionLog.checkAndCreateTransactionLogDir();
                 // This is a "try with resources" thing, I don't know if it works.
-                try (FileWriter file = new FileWriter(TPTransactionLog.PATH_TRANSACTION_LOG.concat(File.pathSeparator).concat(Long.toString(this.getItemId())).concat(".json"))) {
+                try (FileWriter file = new FileWriter(TPTransactionLog.PATH_TRANSACTION_LOG.concat(File.separator).concat(Long.toString(this.getItemId())).concat(".json"))) {
                     file.write(jsonObject.toJSONString());
                     file.flush();
                 }
@@ -294,7 +296,7 @@ public class TPTransactionLog {
         // We'll have to throw a whole bunch of exceptions.
         // Check for folder existence and create the directory if it doesn't exist:
         TPTransactionLog.checkAndCreateTransactionLogDir();
-        File file = new File(TPTransactionLog.PATH_TRANSACTION_LOG.concat(Long.toString(itemId).concat(File.pathSeparator).concat(TPTransactionLog.LOG_EXTENSION)));
+        File file = new File(TPTransactionLog.PATH_TRANSACTION_LOG.concat(File.separator).concat(Long.toString(itemId).concat(TPTransactionLog.LOG_EXTENSION)));
         StandardOpenOption opt = null;
         if (file.exists()) {
             opt = StandardOpenOption.APPEND;
@@ -310,7 +312,7 @@ public class TPTransactionLog {
     private static String generateLogLine(TPEvent event) {
         SimpleDateFormat format = new SimpleDateFormat("dd:MM:yyyy HH:mm:ss");
 	String dateToStr = format.format(new Date());
-        String line = dateToStr.concat(TPTransactionLog.SEPARATOR).concat(Integer.toString(event.getEventType()));
+        String line = dateToStr.concat(TPTransactionLog.SEPARATOR).concat(Integer.toString(event.getEventType())).concat(TPTransactionLog.SEPARATOR);
         // Now it depends on the type of event:
         switch (event.getEventType()) {
             case TPEvent.EVENT_TYPE_HIGHEST_BUY_ORDER_CHANGED:
@@ -352,7 +354,7 @@ public class TPTransactionLog {
         // We'll have to throw a whole bunch of exceptions.
         // Check for folder existence and create the directory if it doesn't exist:
         TPTransactionLog.checkAndCreateTransactionLogDir();
-        File file = new File(TPTransactionLog.PATH_TRANSACTION_LOG.concat(Long.toString(event.getId()).concat(TPTransactionLog.LOG_EXTENSION)));
+        File file = new File(TPTransactionLog.PATH_TRANSACTION_LOG.concat(File.separator).concat(Long.toString(event.getId()).concat(TPTransactionLog.LOG_EXTENSION)));
         StandardOpenOption opt = null;
         if (file.exists()) {
             opt = StandardOpenOption.APPEND;
