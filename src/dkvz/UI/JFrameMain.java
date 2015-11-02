@@ -3,6 +3,7 @@ package dkvz.UI;
 
 import dkvz.mysticWatch.*;
 import dkvz.model.*;
+import dkvz.jobs.*;
 import java.awt.Cursor;
 import java.io.*;
 import java.util.*;
@@ -21,6 +22,7 @@ public class JFrameMain extends javax.swing.JFrame implements CanLogMessages {
     private DataRefresher refresher = null;
     private Thread refreshThread = null;
     private JFrameTransactionLogging logFrame = null;
+    private TPTransactionWatcher watcher = null;
     
     /**
      * Creates new form JFrameMain
@@ -408,7 +410,11 @@ public class JFrameMain extends javax.swing.JFrame implements CanLogMessages {
 
     private void jButtonShowTrnLoggingFrameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonShowTrnLoggingFrameActionPerformed
         if (this.logFrame == null) {
-            this.logFrame = new JFrameTransactionLogging(this);
+            if (this.watcher == null) {
+                this.logFrame = new JFrameTransactionLogging(this);
+            } else {
+                this.logFrame = new JFrameTransactionLogging(this, this.watcher);
+            }
             this.logFrame.setLocationRelativeTo(null);
             this.logFrame.setVisible(true);
             this.logFrame.toFront();
@@ -419,11 +425,35 @@ public class JFrameMain extends javax.swing.JFrame implements CanLogMessages {
     }//GEN-LAST:event_jButtonShowTrnLoggingFrameActionPerformed
 
     private void jButtonTrnLoggingStartSelectedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonTrnLoggingStartSelectedActionPerformed
-        // TODO add your handling code here:
+        int[] selectedRows = this.jTableMain.getSelectedRows();
+        if (selectedRows != null && selectedRows.length > 0) {
+            for (int i : selectedRows) {
+                Item item = this.getDataModel().getItemList().get(this.jTableMain.convertRowIndexToModel(i));
+                this.logMessage("Starting TP transaction log for item " + item.getId());
+                if (this.watcher == null) {
+                    this.watcher = new TPTransactionWatcher();
+                }
+                this.watcher.addItemToWatch(item);
+                if (this.watcher.isAbort()) {
+                    this.watcher.startWatcherThread();
+                }
+            }
+        }
     }//GEN-LAST:event_jButtonTrnLoggingStartSelectedActionPerformed
 
     private void jButtonTrnLoggingStartAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonTrnLoggingStartAllActionPerformed
-        // TODO add your handling code here:
+        if (!this.dataModel.getItemList().isEmpty()) {
+            if (this.watcher == null) {
+                this.watcher = new TPTransactionWatcher();
+            }
+            this.logMessage("Starting TP transaction log for all items...");
+            for (Item i : this.dataModel.getItemList()) {
+                this.watcher.addItemToWatch(i);
+            }
+            if (this.watcher.isAbort()) {
+                this.watcher.startWatcherThread();
+            }
+        }
     }//GEN-LAST:event_jButtonTrnLoggingStartAllActionPerformed
 
 
@@ -544,5 +574,19 @@ public class JFrameMain extends javax.swing.JFrame implements CanLogMessages {
      */
     public void setLogFrame(JFrameTransactionLogging logFrame) {
         this.logFrame = logFrame;
+    }
+
+    /**
+     * @return the watcher
+     */
+    public TPTransactionWatcher getWatcher() {
+        return watcher;
+    }
+
+    /**
+     * @param watcher the watcher to set
+     */
+    public void setWatcher(TPTransactionWatcher watcher) {
+        this.watcher = watcher;
     }
 }

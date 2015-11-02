@@ -294,7 +294,7 @@ public class TPTransactionLog {
         // We'll have to throw a whole bunch of exceptions.
         // Check for folder existence and create the directory if it doesn't exist:
         TPTransactionLog.checkAndCreateTransactionLogDir();
-        File file = new File(TPTransactionLog.PATH_TRANSACTION_LOG.concat(Long.toString(itemId).concat(TPTransactionLog.LOG_EXTENSION)));
+        File file = new File(TPTransactionLog.PATH_TRANSACTION_LOG.concat(Long.toString(itemId).concat(File.pathSeparator).concat(TPTransactionLog.LOG_EXTENSION)));
         StandardOpenOption opt = null;
         if (file.exists()) {
             opt = StandardOpenOption.APPEND;

@@ -32,6 +32,7 @@ public class JFrameTransactionLogging extends javax.swing.JFrame implements CanL
         initComponents();
         this.mainFrame = mainFrame;
         this.watchThread = new TPTransactionWatcher();
+        mainFrame.setWatcher(this.watchThread);
         // Build the list of transaction logs:
         this.jButtonStartStopLogging.setEnabled(false);
         this.buildComboFromFiles();
