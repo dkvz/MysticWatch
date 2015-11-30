@@ -15,7 +15,7 @@ public class TPTransactionWatcher extends Observable implements Runnable, CanLog
     /**
      * Time in milliseconds between API requests.
      */
-    private long requestInterval = 2000;
+    private long requestInterval = 5000;
     private List<TPTransactionLog> transactionLogs = null;
     private boolean abort;
     private CanLogMessages logger = null;
@@ -150,12 +150,22 @@ public class TPTransactionWatcher extends Observable implements Runnable, CanLog
         }
         // Not yet in the list:
         TPTransactionLog log = new TPTransactionLog(item.getId());
+        if (item.getName() != null) {
+            log.setName(item.getName());
+        }
         this.transactionLogs.add(log);
     }
 
     public synchronized void addItemToWatch(long itemId) {
         Item item = new Item();
         item.setId(itemId);
+        this.addItemToWatch(item);
+    }
+    
+    public synchronized void addItemToWatch(long itemId, String name) {
+        Item item = new Item();
+        item.setId(itemId);
+        item.setName(name);
         this.addItemToWatch(item);
     }
 

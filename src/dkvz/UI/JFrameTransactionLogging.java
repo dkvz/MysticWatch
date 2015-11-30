@@ -33,6 +33,7 @@ public class JFrameTransactionLogging extends javax.swing.JFrame implements CanL
         this.mainFrame = mainFrame;
         this.watchThread = new TPTransactionWatcher();
         mainFrame.setWatcher(this.watchThread);
+        this.watchThread.addObserver(this);
         // Build the list of transaction logs:
         this.jButtonStartStopLogging.setEnabled(false);
         this.buildComboFromFiles();
@@ -42,6 +43,7 @@ public class JFrameTransactionLogging extends javax.swing.JFrame implements CanL
         initComponents();
         this.mainFrame = mainFrame;
         this.watchThread = watchThread;
+        this.watchThread.addObserver(this);
         // Build the list of transaction logs:
         this.jButtonStartStopLogging.setEnabled(false);
         this.buildComboFromFiles();
@@ -245,12 +247,17 @@ public class JFrameTransactionLogging extends javax.swing.JFrame implements CanL
                 Item item = (Item)this.jComboBoxTransactionFile.getSelectedItem();
                 // Load the events table:
                 TPTransactionLog tLog = new TPTransactionLog(item.getId());
+                if (item.getName() != null && !item.getName().isEmpty()) {
+                    tLog.setName(item.getName());
+                }
                 DataLoadingRunnable tpLogLoader = new DataLoadingRunnable(tLog, this);
                 Thread t = new Thread(tpLogLoader);
                 this.jProgressBarLog.setMaximum(110);
                 this.jProgressBarLog.setValue(0);
                 t.start();
                 while (!tLog.isLoaded()) {
+                    // This loop creates a lockdown unless we yield:
+                    Thread.yield();
                     this.jProgressBarLog.setValue(tLog.getProgress());
                 }
                 // The file is loaded.
@@ -356,7 +363,7 @@ public class JFrameTransactionLogging extends javax.swing.JFrame implements CanL
             } else {
                 this.jButtonStartStopLogging.setEnabled(false);
                 // Start the logging for this item.
-                this.watchThread.addItemToWatch(this.currentlyDisplayed.getItemId());
+                this.watchThread.addItemToWatch(this.currentlyDisplayed.getItemId(), this.currentlyDisplayed.getName());
                 // This may have to actually start the thread itself.
                 if (this.watchThread.isAbort()) {
                     // Start the thread:
@@ -420,7 +427,15 @@ public class JFrameTransactionLogging extends javax.swing.JFrame implements CanL
                     this.buildComboFromFiles();
                     this.currentlyDisplayed = null;
                     // TODO: what happens if this was the selected event? I may have to clean the datatable.
-
+                    if (this.jComboBoxTransactionFile.getItemCount() == 0) {
+                        // Get the dataModel from the table, if it's a TPLogTableDataModel instance, empty the list:
+                        TableModel tModel = this.jTableTransactionLog.getModel();
+                        if (tModel instanceof TPLogTableDataModel) {
+                            TPLogTableDataModel model = (TPLogTableDataModel) tModel;
+                            model.clear();
+                            this.refreshDataTable();
+                        }
+                    }
                 } finally {
                     this.setCursor(initCursor);
                 }

@@ -3,6 +3,7 @@ package dkvz.UI;
 
 import java.util.*;
 import dkvz.model.*;
+import java.text.*;
 import javax.swing.table.AbstractTableModel;
 
 /**
@@ -16,10 +17,12 @@ public class TPLogTableDataModel extends AbstractTableModel {
     // the original in the transaction log.
     private List<TPEvent> eventList = null;
     private TPTransactionLog transactionLog = null;
+    private SimpleDateFormat dateFormat = null;
 
     public TPLogTableDataModel(TPTransactionLog transactionLog) {
         this.columnNames = new String[]{"Time", "Event", "Prev. order(g)", "Prev. quantity", "New order(g)", "New quantity"};
         this.transactionLog = transactionLog;
+        this.dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         // It's supposed to have loaded the data already.
         this.eventList = new ArrayList<TPEvent>();
         this.generateModelList();
@@ -37,6 +40,12 @@ public class TPLogTableDataModel extends AbstractTableModel {
                     this.eventList.add(event);
                 }
             }
+        }
+    }
+    
+    public void clear() {
+        if (this.eventList != null) {
+            this.eventList.clear();
         }
     }
 
@@ -70,7 +79,7 @@ public class TPLogTableDataModel extends AbstractTableModel {
         TPEvent event = this.eventList.get(row);
         switch (col) {
             case 0:
-                value = event.getDate();
+                value = dateFormat.format(event.getDate());
                 break;
             case 1:
                 switch (event.getEventType()) {
