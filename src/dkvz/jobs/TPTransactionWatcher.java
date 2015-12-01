@@ -44,7 +44,7 @@ public class TPTransactionWatcher extends Observable implements Runnable, CanLog
                     if (tpLog == null) continue;
                     // Check if those instances have loaded their data (should be loaded before so we
                     // can easily display the progress on progress bars).
-                    if (!tpLog.isLoaded()) {
+                    if (!tpLog.isLoadedStateOnly()) {
                         try {
                             this.logMessage("TP listings for " + tpLog.getItemId() + " have to be loaded...");
                             tpLog.loadItemState();
@@ -62,7 +62,7 @@ public class TPTransactionWatcher extends Observable implements Runnable, CanLog
                         if (this.abort) {
                             break;
                         }
-                    // We're supposed to compare with the older state to create events... Right?
+                        // We're supposed to compare with the older state to create events... Right?
                         // There should be a comparison method in TPListings.
                         List<TPEvent> tpEvents = tpLog.getTpListings().getTPEventsUpToListing(newState);
                         // Save the new listing as the current listing.
@@ -106,6 +106,7 @@ public class TPTransactionWatcher extends Observable implements Runnable, CanLog
                         Thread.sleep(this.requestInterval);
                     }
                 }
+                Thread.yield();
             }
         } catch (InterruptedException ex) {
             // We're just stopping the thread here.
@@ -226,14 +227,14 @@ public class TPTransactionWatcher extends Observable implements Runnable, CanLog
     /**
      * @return the abort
      */
-    public boolean isAbort() {
+    public final boolean isAbort() {
         return abort;
     }
 
     /**
      * @param abort the abort to set
      */
-    public void setAbort(boolean abort) {
+    public final void setAbort(boolean abort) {
         this.abort = abort;
     }
 

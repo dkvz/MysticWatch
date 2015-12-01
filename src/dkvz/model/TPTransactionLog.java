@@ -31,6 +31,7 @@ public class TPTransactionLog {
     private long itemId;
     private String name;
     private boolean loaded = false;
+    private boolean loadedStateOnly = false;
     private List<TPEvent> eventListRead = null;
     private TPListings tpListings = null;
     
@@ -235,7 +236,7 @@ public class TPTransactionLog {
         this.tpListings = new TPListings(this.itemId);
         // Check if the file exists:
         if (this.itemId > 0) {
-            String filPath = TPTransactionLog.PATH_TRANSACTION_LOG.concat(Long.toString(itemId)).concat(".json");
+            String filPath = TPTransactionLog.PATH_TRANSACTION_LOG.concat(File.separator).concat(Long.toString(this.getItemId())).concat(".json");
             File file = new File(filPath);
             if (file.exists()) {
                 // It does exist.
@@ -272,6 +273,7 @@ public class TPTransactionLog {
                         arr[1] = quantity;
                         this.tpListings.getSells().put(unitPrice, arr);
                     }
+                    this.setLoadedStateOnly(true);
                 } catch (ClassCastException ex) {
                     ex.printStackTrace();
                     throw new org.json.simple.parser.ParseException(10);
@@ -447,6 +449,20 @@ public class TPTransactionLog {
      */
     public void setName(String name) {
         this.name = name;
+    }
+
+    /**
+     * @return the loadedStateOnly
+     */
+    public boolean isLoadedStateOnly() {
+        return loadedStateOnly;
+    }
+
+    /**
+     * @param loadedStateOnly the loadedStateOnly to set
+     */
+    public void setLoadedStateOnly(boolean loadedStateOnly) {
+        this.loadedStateOnly = loadedStateOnly;
     }
     
 }

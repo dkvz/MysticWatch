@@ -3,12 +3,7 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/home/william/NetBeansProjects/MysticWatch/src/dkvz/UI/DataLoadingRunnable.java</file>
-            <file>file:/home/william/NetBeansProjects/MysticWatch/src/dkvz/jobs/TPTransactionWatcher.java</file>
-            <file>file:/home/william/NetBeansProjects/MysticWatch/src/dkvz/model/TPTransactionLog.java</file>
-            <file>file:/home/william/NetBeansProjects/MysticWatch/src/dkvz/UI/JFrameMain.java</file>
-            <file>file:/home/william/NetBeansProjects/MysticWatch/src/dkvz/UI/JFrameTransactionLogging.java</file>
-            <file>file:/home/william/NetBeansProjects/MysticWatch/src/dkvz/model/Item.java</file>
+            <file>file:/home/william/NetBeansProjects/MysticWatch/src/dkvz/UI/TPLogTableDataModel.java</file>
         </group>
     </open-files>
 </project-private>

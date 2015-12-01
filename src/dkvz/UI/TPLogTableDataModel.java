@@ -43,6 +43,12 @@ public class TPLogTableDataModel extends AbstractTableModel {
         }
     }
     
+    public void addEvents(List<TPEvent> tpEvents) {
+        if (tpEvents != null && !tpEvents.isEmpty()) {
+            this.eventList.addAll(tpEvents);
+        }
+    }
+    
     public void clear() {
         if (this.eventList != null) {
             this.eventList.clear();
@@ -110,8 +116,14 @@ public class TPLogTableDataModel extends AbstractTableModel {
                     case TPEvent.EVENT_TYPE_NEW_SELL_LISTING:
                         value = "New Sell Order";
                         break;
+                    case TPEvent.EVENT_TYPE_BUY_ORDER_GONE:
+                        value = "Buy Order Gone";
+                        break;
+                    case TPEvent.EVENT_TYPE_SELL_ORDER_GONE:
+                        value = "Sell Order Gone";
+                        break;
                     default:
-                        value = "Unknown event";
+                        value = "Unknown event - Type " + event.getEventType();
                 }
                 break;
             case 2:
