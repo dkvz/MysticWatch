@@ -434,6 +434,7 @@ public class JFrameMain extends javax.swing.JFrame implements CanLogMessages {
                     this.watcher = new TPTransactionWatcher();
                 }
                 this.watcher.addItemToWatch(item);
+                this.watcher.setLogger(this);
                 if (this.watcher.isAbort()) {
                     this.watcher.startWatcherThread();
                 }

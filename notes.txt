@@ -10,10 +10,8 @@ Namespace is import org.json.simple.*;
 
 ===== Ideas - Issues =====
   * The system could use an authentication token to check how much money you have in bank and which item you can afford (highlight those?).
-  * In craft components, I should be able to put in fixed price stuff (stuff that you can't get on the TP).
   * Some of the items also require a recipe...
   * Make a "name cache", loading on demand when needed to fetch item names. Advanced stuff: provide a way to purge name cache.
-  * I think quantity is absent from the transaction log display. There are listings but those are independant from the total quantity of items.
-  * I forgot about two types of TPEvents about listings that are gone. I don't know if that has consequences for the UI too.
   * I don't think I've put the TPEvent logging started (and ended) anywhere, that should be a thing.
-  * The main frame may create a transaction logging thread, and then pass it in the constructor of the transaction logging frame, if it exists.
+  * Transaction logging always starts with a single event of "Highest buy order changed", and it's bogus.
+  * Attemting to delete a transaction log often doesn't work because of the state file. Maybe the handle is left open somewhere?

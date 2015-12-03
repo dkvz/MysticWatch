@@ -416,7 +416,9 @@ public class JFrameTransactionLogging extends javax.swing.JFrame implements CanL
                     String base = TPTransactionLog.PATH_TRANSACTION_LOG.concat(File.separator).concat(Long.toString(this.currentlyDisplayed.getItemId()));
                     File state = new File(base.concat(TPTransactionLog.STATE_EXTENSION));
                     File log = new File(base.concat(TPTransactionLog.LOG_EXTENSION));
+                    System.gc();
                     if (state.exists()) {
+                        state.setWritable(true);
                         boolean success = state.delete();
                         if (success) {
                             this.logMessage("Deleted state file for item " + this.currentlyDisplayed.getItemId());

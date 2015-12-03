@@ -179,7 +179,8 @@ public class TPTransactionLog {
         Item res = null;
         // First check if the file exists.
         JSONParser parser = new JSONParser();
-        Object obj = parser.parse(new FileReader(file));
+        FileReader fl = new FileReader(file);
+        Object obj = parser.parse(fl);
         try {
             JSONObject jsonObject = (JSONObject) obj;
             Long id = (Long)jsonObject.get("id");
@@ -193,8 +194,9 @@ public class TPTransactionLog {
                 res.setName(name);
             }
         } catch (ClassCastException ex) {
-            ex.printStackTrace();
             throw new org.json.simple.parser.ParseException(10);
+        } finally {
+            fl.close();
         }
         return res;
     }
@@ -321,9 +323,9 @@ public class TPTransactionLog {
             case TPEvent.EVENT_TYPE_LOWEST_SELL_ORDER_CHANGED:
                 // Log new highest buy order, previous highest buy order + quantity for reach.
                 // Order: prev highest buy order ; prev listings ; new highest buy order ; new listings ; prev quantity ; new quantity
-                line = line.concat(Double.toString(event.getNewPrice())).concat(TPTransactionLog.VALUES_SEPARATOR).concat(Long.toString(event.getNewListingCount()))
-                        .concat(TPTransactionLog.VALUES_SEPARATOR).concat(Double.toString(event.getPreviousPrice())).concat(TPTransactionLog.VALUES_SEPARATOR)
-                        .concat(Long.toString(event.getPreviousListingCount())).concat(TPTransactionLog.VALUES_SEPARATOR).concat(Long.toString(event.getPreviousQuantity()))
+                line = line.concat(Double.toString(event.getPreviousPrice())).concat(TPTransactionLog.VALUES_SEPARATOR).concat(Long.toString(event.getPreviousListingCount()))
+                        .concat(TPTransactionLog.VALUES_SEPARATOR).concat(Double.toString(event.getNewPrice())).concat(TPTransactionLog.VALUES_SEPARATOR)
+                        .concat(Long.toString(event.getNewListingCount())).concat(TPTransactionLog.VALUES_SEPARATOR).concat(Long.toString(event.getPreviousQuantity()))
                         .concat(TPTransactionLog.VALUES_SEPARATOR).concat(Long.toString(event.getQuantity()));
                 break;
             case TPEvent.EVENT_TYPE_BUY_ORDER_LISTING_QUANTITY_MODIFIED:
